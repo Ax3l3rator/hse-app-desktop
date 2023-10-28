@@ -10,4 +10,8 @@ export default defineNuxtConfig({
       },
     ],
   },
+  ssr: false,
+  experimental: {
+    appManifest: false, // set this to false, then the application starts working
+  },
 });

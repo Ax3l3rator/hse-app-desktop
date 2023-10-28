@@ -2,8 +2,8 @@
   "name": "nuxt-app",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
+    "build": "nuxt build --prerender && electron-builder",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -19,5 +19,6 @@
     "vue": "^3.3.7",
     "vue-router": "^4.2.5"
   },
-  "main": "dist-electron/main.js"
+  "main": "dist-electron/main.js",
+  "version": "0.0.1"
 }
