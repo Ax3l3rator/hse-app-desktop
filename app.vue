@@ -12,7 +12,7 @@
 
 ::-webkit-scrollbar-thumb {
   border-radius: 6px;
-  background: rgba(var(--v-theme-surface));
+  background: rgba(var(--v-theme-surface-variant), 0.25);
   border: solid 3.8px transparent;
   background-clip: content-box;
 }
