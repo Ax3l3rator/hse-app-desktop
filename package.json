@@ -10,8 +10,13 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@types/jsonwebtoken": "^9.0.4",
+    "@types/node": "^20.8.10",
+    "dotenv": "^16.3.1",
     "electron": "^27.0.2",
     "electron-builder": "^24.6.4",
+    "electron-store": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "nuxt": "^3.8.0",
     "nuxt-electron": "^0.6.0",
     "sass": "^1.69.5",

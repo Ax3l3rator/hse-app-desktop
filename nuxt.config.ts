@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import readFileSync from 'fs';
+import resolve from 'path';
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
@@ -12,6 +14,12 @@ export default defineNuxtConfig({
       });
     },
   ],
+  // devServer: {
+  //   https: {
+  //     key: './server.key',
+  //     cert: './server.crt',
+  //   },
+  // },
   electron: {
     build: [
       {
@@ -40,14 +48,11 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
-    ssr: {
-      noExternal: ['vuetify'],
-    },
   },
-  nitro: {
-    routeRules: {
-      '/*': { cors: true },
-      '/': { prerender: true },
-    },
-  },
+  // nitro: {
+  //   routeRules: {
+  //     '/*': { cors: true },
+  //     '/': { prerender: true },
+  //   },
+  // },
 });

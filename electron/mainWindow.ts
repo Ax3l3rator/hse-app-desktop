@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, type CommandLine } from 'electron';
 import { join, resolve } from 'node:path';
 
 async function createWindow() {
@@ -9,7 +9,7 @@ async function createWindow() {
       contextIsolation: true,
       sandbox: false,
       webviewTag: false,
-      preload: join(app.getAppPath(), 'preload.{ts,js}'),
+      preload: join(app.getAppPath(), 'preload.js'),
     },
     title: 'Hse App Desktop',
   });
@@ -51,6 +51,5 @@ export async function restoreOrCreateWindow() {
   if (window.isMinimized()) {
     window.restore();
   }
-
   window.focus();
 }

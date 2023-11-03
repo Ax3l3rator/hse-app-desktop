@@ -18,6 +18,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  border-radius: 8px;
   background: rgba(var(--v-theme-surface-variant));
   border: solid 3px transparent;
   background-clip: content-box;

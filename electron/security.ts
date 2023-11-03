@@ -14,6 +14,7 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
 
 const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>([
   'https://hse.ru',
+  'https://github.com',
 ]);
 
 app.on('web-contents-created', (_, contents) => {
