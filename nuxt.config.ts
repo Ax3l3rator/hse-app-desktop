@@ -48,6 +48,9 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    ssr: {
+      noExternal: ['vuetify'],
+    },
   },
   // nitro: {
   //   routeRules: {

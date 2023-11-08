@@ -1,4 +1,4 @@
-import { checkType, type TypeChecker } from './TypeChecker';
+import { checkType } from './TypeChecker';
 
 export type Token = {
   token: string;

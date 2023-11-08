@@ -1,7 +1,9 @@
 <template>
   <NuxtLayout>
     <v-app>
-      <NuxtPage />
+      <div class="pr-5 pl-7 py-4">
+        <NuxtPage />
+      </div>
     </v-app>
   </NuxtLayout>
 </template>

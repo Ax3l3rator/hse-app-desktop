@@ -1,9 +1,9 @@
 import { net } from 'electron';
-import { isAccessData } from '../types/AccessData';
+import { isAccessData } from '../types';
 import * as jwt from 'jsonwebtoken';
 import { env_client_id } from '../config';
 import { Vault } from './Vault';
-import type { AccessData } from '../types/AccessData';
+import type { AccessData } from '../types';
 
 function getCodeFromUrl(url: string): string {
   const code = new URL(url).searchParams.get('code');
