@@ -1,5 +1,5 @@
 <template>
-  <v-sheet :elevation="6" :height="200" :width="200" color="primary">
+  <v-sheet :elevation="6" :height="200" color="primary" class="rounded-lg pa-3">
     This is a test vuetify sheet!
     <v-btn @click="docss"> test button</v-btn>
   </v-sheet>

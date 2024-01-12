@@ -11,6 +11,7 @@ async function createWindow() {
       webviewTag: false,
       preload: join(app.getAppPath(), 'preload.js'),
     },
+    icon: '../icons/icon.png',
     title: 'Hse App Desktop',
   });
 

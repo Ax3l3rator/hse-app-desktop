@@ -1,6 +1,21 @@
 <template>
   <v-app id="hse">
-    <v-navigation-drawer permanent class="d-block" rail expand-on-hover>
+    <v-navigation-drawer permanent class="d-block py-1" rail expand-on-hover>
+      <v-list>
+        <v-list-item title="John Leider" subtitle="john@google.com">
+          <template v-slot:append>
+            <v-btn size="small" variant="plain" icon="mdi-cog"></v-btn>
+          </template>
+          <template v-slot:prepend>
+            <v-avatar color="primary">
+              <v-icon icon="mdi-account"></v-icon>
+            </v-avatar>
+          </template>
+        </v-list-item>
+      </v-list>
+
+      <v-divider></v-divider>
+
       <v-list density="compact" nav>
         <v-list-item
           v-for="element of menuElements"

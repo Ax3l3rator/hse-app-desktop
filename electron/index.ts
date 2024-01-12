@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { authorizeByRedirectUrl } from './utils/authorization';
 
 const isSingleInstance = app.requestSingleInstanceLock();
-
+app.commandLine.appendSwitch('enable-overlay-scrollbar');
 if (!isSingleInstance) {
   app.quit();
   process.exit(0);
@@ -20,6 +20,8 @@ app.on('window-all-closed', () => {
   if (platform !== 'darwin') {
     app.quit();
   }
+
+  process.kill(process.pid, 'SIGINT');
 });
 
 app.on('second-instance', (event, commandLine) => {
