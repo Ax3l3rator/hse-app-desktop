@@ -58,7 +58,7 @@ app
       }
     });
     ipcMain.handle('get-user-info', HSEAuthService.getUserInfo);
-    ipcMain.handle('reset-tokens', async () => HSEAuthService.leave);
+    ipcMain.handle('reset-tokens', HSEAuthService.leave);
     restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

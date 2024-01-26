@@ -4,7 +4,7 @@
   "scripts": {
     "build": "nuxt build --prerender && electron-builder",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -37,5 +37,36 @@
   },
   "resolutions": {
     "jackspeak": "2.1.1"
+  },
+  "build": {
+    "appId": "hse.app.desktop",
+    "asar": true,
+    "productName": "HSE App Desktop",
+    "directories": {
+      "output": "release/${version}"
+    },
+    "mac": {
+      "artifactName": "${productName}_${version}.${ext}",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}_${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
   }
 }

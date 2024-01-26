@@ -53,6 +53,15 @@ export default defineNuxtConfig({
       noExternal: ['vuetify'],
     },
   },
+  router: {
+    options: {
+      hashMode: true,
+    },
+  },
+  app: {
+    baseURL: './',
+  },
+  pages: true,
   // nitro: {
   //   routeRules: {
   //     '/*': { cors: true },

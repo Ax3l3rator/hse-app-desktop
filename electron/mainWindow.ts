@@ -1,5 +1,9 @@
 import { app, BrowserWindow, type CommandLine } from 'electron';
 import { join, resolve } from 'node:path';
+import { format } from 'node:url';
+
+const preload = join(__dirname, 'preload.js');
+const distPath = join(__dirname, '../.output/public');
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -16,11 +20,16 @@ async function createWindow() {
     width: 1280,
     height: 720,
     icon: '../icons/icon.png',
-    title: 'Hse App Desktop',
+    title: 'HSE App Desktop',
   });
 
   browserWindow.on('ready-to-show', () => {
     browserWindow?.show();
+    browserWindow.webContents.on('before-input-event', (_, input) => {
+      if (input.type === 'keyDown' && input.key === 'F12') {
+        browserWindow.webContents.openDevTools({ mode: 'detach' });
+      }
+    });
     if (import.meta.env.DEV) {
       browserWindow.webContents.on('before-input-event', (_, input) => {
         if (input.type === 'keyDown' && input.key === 'F12') {
@@ -33,7 +42,13 @@ async function createWindow() {
   if (import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL !== undefined) {
     await browserWindow.loadURL(import.meta.env.VITE_DEV_SERVER_URL);
   } else {
-    await browserWindow.loadFile(resolve(__dirname, '../.output/public/index.html'));
+    await browserWindow.loadURL(
+      format({
+        pathname: join(app.getAppPath(), '.output/public/index.html'),
+        slashes: true,
+        protocol: 'file:',
+      }),
+    );
   }
 
   browserWindow.removeMenu();
