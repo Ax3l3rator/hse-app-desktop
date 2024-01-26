@@ -1,9 +1,11 @@
 // import './security';
-import { app } from 'electron';
-import { restoreOrCreateWindow } from './mainWindow';
+import { app, ipcMain } from 'electron';
+import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
 import { platform } from 'node:process';
 import { resolve } from 'path';
-import { authorizeByRedirectUrl } from './utils/authorization';
+import { HSEAuthService } from './utils/HSEAuthService';
+import { InternalEventEmitter } from './utils/InternalEventEmitter';
+import { Vault } from './utils/Vault';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -24,10 +26,17 @@ app.on('window-all-closed', () => {
   process.kill(process.pid, 'SIGINT');
 });
 
-app.on('second-instance', (event, commandLine) => {
+app.on('second-instance', async (event, commandLine) => {
   const deepLink = commandLine.at(-1);
-  if (deepLink) authorizeByRedirectUrl(deepLink);
-  else throw new Error('Unknown');
+  if (deepLink) {
+    try {
+      await HSEAuthService.authorizeByRedirectUrl(deepLink);
+      console.log(Vault.getToken('access'));
+      await sendAuthEvent();
+    } catch (err) {
+      console.log(err);
+    }
+  } else throw new Error('Unknown');
 });
 
 app.on('open-url', (event, url) => {
@@ -38,14 +47,25 @@ app.on('activate', restoreOrCreateWindow);
 
 app
   .whenReady()
-  .then(restoreOrCreateWindow)
+  .then(() => {
+    ipcMain.handle('auth-hse-browser', HSEAuthService.openAuthBrowserExternal);
+    InternalEventEmitter.getAuthEventHook(HSEAuthService.openAuthBrowserExternal);
+    ipcMain.handle('check-authorization', async () => {
+      try {
+        return await HSEAuthService.authorize();
+      } catch (err) {
+        return false;
+      }
+    });
+    ipcMain.handle('get-user-info', HSEAuthService.getUserInfo);
+    ipcMain.handle('reset-tokens', async () => HSEAuthService.leave);
+    restoreOrCreateWindow();
+  })
   .catch((e) => console.error('Failed create window:', e));
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient('ruz-app-fiddle', process.execPath, [
-      resolve(process.argv[1]),
-    ]);
+    app.setAsDefaultProtocolClient('ruz-app-fiddle', process.execPath, [resolve(process.argv[1])]);
   }
 } else {
   app.setAsDefaultProtocolClient('ruz-app-fiddle');

@@ -5,7 +5,7 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
   css: ['vuetify/styles'],
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: [
     'nuxt-electron',
     (_options, nuxt) => {
@@ -13,6 +13,7 @@ export default defineNuxtConfig({
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },
+    '@vueuse/nuxt',
   ],
   // devServer: {
   //   https: {

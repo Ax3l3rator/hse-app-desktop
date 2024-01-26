@@ -3,5 +3,5 @@ import { resolve } from 'path';
 
 dotenv.config({ path: resolve(__dirname, '../.env') });
 
-export const env_client_id = process.env.CLIENT_ID || 'null';
-export const env_secret_key = process.env.SECRET_KEY || 'null';
+export const CLIENT_ID = process.env.CLIENT_ID || 'null';
+export const SECRET_KEY = process.env.SECRET_KEY || 'null';

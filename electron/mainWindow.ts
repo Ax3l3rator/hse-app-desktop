@@ -9,8 +9,12 @@ async function createWindow() {
       contextIsolation: true,
       sandbox: false,
       webviewTag: false,
-      preload: join(app.getAppPath(), 'preload.js'),
+      preload: join(app.getAppPath(), './dist-electron/preload.js'),
     },
+    minHeight: 500,
+    minWidth: 500,
+    width: 1280,
+    height: 720,
     icon: '../icons/icon.png',
     title: 'Hse App Desktop',
   });
@@ -26,15 +30,10 @@ async function createWindow() {
     }
   });
 
-  if (
-    import.meta.env.DEV &&
-    import.meta.env.VITE_DEV_SERVER_URL !== undefined
-  ) {
+  if (import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL !== undefined) {
     await browserWindow.loadURL(import.meta.env.VITE_DEV_SERVER_URL);
   } else {
-    await browserWindow.loadFile(
-      resolve(__dirname, '../.output/public/index.html'),
-    );
+    await browserWindow.loadFile(resolve(__dirname, '../.output/public/index.html'));
   }
 
   browserWindow.removeMenu();
@@ -53,4 +52,16 @@ export async function restoreOrCreateWindow() {
     window.restore();
   }
   window.focus();
+}
+
+export async function sendAuthEvent() {
+  BrowserWindow.getAllWindows()
+    .find((w) => !w.isDestroyed())
+    ?.webContents.send('authorize');
+}
+
+export async function sendLeaveEvent() {
+  BrowserWindow.getAllWindows()
+    .find((w) => !w.isDestroyed())
+    ?.webContents.send('leave');
 }

@@ -1,58 +1,23 @@
 <template>
-  <v-app id="hse">
-    <v-navigation-drawer permanent class="d-block py-1" rail expand-on-hover>
-      <v-list>
-        <v-list-item title="John Leider" subtitle="john@google.com">
-          <template v-slot:append>
-            <v-btn size="small" variant="plain" icon="mdi-cog"></v-btn>
-          </template>
-          <template v-slot:prepend>
-            <v-avatar color="primary">
-              <v-icon icon="mdi-account"></v-icon>
-            </v-avatar>
-          </template>
-        </v-list-item>
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-list density="compact" nav>
-        <v-list-item
-          v-for="element of menuElements"
-          :key="element.value"
-          :to="element.to"
-          :value="element.value"
-          :prepend-icon="element.icon"
-          :title="element.title"
-        >
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-main>
-      <slot />
-    </v-main>
-  </v-app>
+  <div class="my-auto mx-auto pr-5 pl-7 py-4">
+    <v-sheet class="rounded-lg pa-4" width="400" height="200">
+      <v-container>
+        <v-row no-gutters justify="center" align="center" align-content="center">
+          <v-col cols="10" class="text-center text-medium-emphasis">
+            Вы не вошли в учетную запись, если окно авторизации не открылось в браузере - нажмите на кнопку ниже
+          </v-col>
+        </v-row>
+        <v-row no-gutters justify="center" align="center" class="mt-6">
+          <v-col cols="8" class="d-flex justify-content-center">
+            <v-btn variant="tonal" color="blue-darken-1 mx-auto" block @click="authorize()"> Войти </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-sheet>
+  </div>
 </template>
-
-<script setup>
-const menuElements = ref([
-  {
-    icon: 'mdi-home',
-    title: 'Future navigation',
-    value: 'home',
-    to: '/',
-  },
-  {
-    icon: 'mdi-magnify',
-    title: 'Future navigation',
-    value: 'search',
-    to: '/auth',
-  },
-]);
+<script setup lang="ts">
+const authorize = () => {
+  window.electronAPI.authorizeViaBrowser();
+};
 </script>
-
-<style scoped>
-:deep(.v-navigation-drawer__content::-webkit-scrollbar) {
-  display: none;
-}
-</style>
