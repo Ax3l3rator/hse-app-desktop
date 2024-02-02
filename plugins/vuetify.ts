@@ -20,7 +20,6 @@ export default defineNuxtPlugin((app) => {
         light: {
           dark: false,
           colors: {
-            scrollbar: colors.grey.lighten2,
             primary: colors.blue.base,
             'primary-lighten-1': colors.blue.lighten1,
             'primary-darken-1': colors.blue.darken1,

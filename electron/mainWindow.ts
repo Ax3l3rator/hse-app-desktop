@@ -1,9 +1,6 @@
-import { app, BrowserWindow, type CommandLine } from 'electron';
-import { join, resolve } from 'node:path';
+import { app, BrowserWindow } from 'electron';
+import { join } from 'node:path';
 import { format } from 'node:url';
-
-const preload = join(__dirname, 'preload.js');
-const distPath = join(__dirname, '../.output/public');
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -15,8 +12,8 @@ async function createWindow() {
       webviewTag: false,
       preload: join(app.getAppPath(), './dist-electron/preload.js'),
     },
-    minHeight: 500,
-    minWidth: 500,
+    minHeight: 600,
+    minWidth: 800,
     width: 1280,
     height: 720,
     icon: '../icons/icon.png',

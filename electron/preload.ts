@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   authorizeViaBrowser: async () => ipcRenderer.invoke('auth-hse-browser'),
-  checkIfAuthorized: async () => await ipcRenderer.invoke('check-authorization'),
+  checkIfAuthorized: async () => ipcRenderer.invoke('check-authorization'),
   leave: async () => await ipcRenderer.invoke('reset-tokens'),
   getUserInfo: async () => await ipcRenderer.invoke('get-user-info'),
   onAuthorize: async (callback: (...args: any[]) => void) =>

@@ -1,5 +1,5 @@
 <template>
-  <v-virtual-scroll>
+  <!-- <v-virtual-scroll>
     <template v-slot:default>
       <div class="text-center">
         <v-menu open-on-hover>
@@ -15,12 +15,12 @@
         </v-menu>
       </div>
     </template>
-  </v-virtual-scroll>
+  </v-virtual-scroll> -->
 </template>
-<script>
-export default {
-  data: () => ({
-    items: [{ title: 'Click Me' }, { title: 'Click Me' }, { title: 'Click Me' }, { title: 'Click Me 2' }],
-  }),
-};
+<script setup>
+// export default {
+//   data: () => ({
+//     items: [{ title: 'Click Me' }, { title: 'Click Me' }, { title: 'Click Me' }, { title: 'Click Me 2' }],
+//   }),
+// };
 </script>

@@ -1,11 +1,9 @@
 <template>
-  <v-app>
-    <NuxtLayout :name="currentLayout">
-      <div class="pr-5 pl-7 pt-3 pb-12">
-        <NuxtPage />
-      </div>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
     </NuxtLayout>
-  </v-app>
+  </div>
 </template>
 <style>
 ::-webkit-scrollbar {
@@ -40,22 +38,4 @@
   background-color: transparent;
 }
 </style>
-<script setup lang="ts">
-const currentLayout = ref<'authorized' | 'default'>('default');
-
-const auth = await window.electronAPI.checkIfAuthorized();
-if (auth) {
-  currentLayout.value = 'authorized';
-} else {
-  currentLayout.value = 'default';
-}
-currentLayout.value = 'authorized';
-
-window.electronAPI.onAuthorize(() => {
-  currentLayout.value = 'authorized';
-});
-
-window.electronAPI.onLeave(() => {
-  currentLayout.value = 'default';
-});
-</script>
+<script setup lang="ts"></script>

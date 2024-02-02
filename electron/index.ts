@@ -5,7 +5,6 @@ import { platform } from 'node:process';
 import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
 import { InternalEventEmitter } from './utils/InternalEventEmitter';
-import { Vault } from './utils/Vault';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -31,8 +30,9 @@ app.on('second-instance', async (event, commandLine) => {
   if (deepLink) {
     try {
       await HSEAuthService.authorizeByRedirectUrl(deepLink);
-      console.log(Vault.getToken('access'));
-      await sendAuthEvent();
+      setTimeout(async () => {
+        await sendAuthEvent();
+      }, 1000);
     } catch (err) {
       console.log(err);
     }
@@ -48,16 +48,18 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(() => {
-    ipcMain.handle('auth-hse-browser', HSEAuthService.openAuthBrowserExternal);
+    ipcMain.handle('auth-hse-browser', () => HSEAuthService.openAuthBrowserExternal());
     InternalEventEmitter.getAuthEventHook(HSEAuthService.openAuthBrowserExternal);
     ipcMain.handle('check-authorization', async () => {
       try {
-        return await HSEAuthService.authorize();
+        const res = await HSEAuthService.authorize();
+        return res;
       } catch (err) {
         return false;
       }
     });
-    ipcMain.handle('get-user-info', HSEAuthService.getUserInfo);
+
+    ipcMain.handle('get-user-info', () => HSEAuthService.getUserInfo());
     ipcMain.handle('reset-tokens', HSEAuthService.leave);
     restoreOrCreateWindow();
   })

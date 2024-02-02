@@ -1,10 +1,10 @@
 import { net, shell } from 'electron';
-import { isAccessData } from '../types';
+import { isAccessData, isRefreshData } from '../types';
 import { CLIENT_ID } from '../config';
 import * as jwt from 'jsonwebtoken';
 import { Vault } from './Vault';
-import type { AccessData } from '../types';
-import { InternalEventEmitter } from './InternalEventEmitter';
+import type { AccessData, RefreshData } from '../types';
+// import { InternalEventEmitter } from './InternalEventEmitter';
 import { sendLeaveEvent } from '../mainWindow';
 
 export class HSEAuthService {
@@ -18,7 +18,7 @@ export class HSEAuthService {
     grant_type: 'authorization_code' | 'refresh_token',
     additional_data: { refresh_token: string } | { code: string },
   ) {
-    return new Promise<AccessData>((resolve, reject) => {
+    return new Promise<AccessData | RefreshData>((resolve, reject) => {
       const request = net.request({
         url: 'https://auth.hse.ru/adfs/oauth2/token/',
         method: 'POST',
@@ -31,9 +31,11 @@ export class HSEAuthService {
         });
 
         response.on('end', () => {
-          const accessData = JSON.parse(Buffer.concat(data).toString());
-          if (isAccessData(accessData)) {
-            resolve(accessData);
+          const responseData = JSON.parse(Buffer.concat(data).toString());
+          if (isAccessData(responseData)) {
+            resolve(responseData);
+          } else if (isRefreshData(responseData)) {
+            resolve(responseData);
           } else {
             reject(new Error('Response data has wrong format'));
           }
@@ -67,6 +69,7 @@ export class HSEAuthService {
 
   public static async refreshAccessData() {
     if (!HSEAuthService.isExpiredToken('refresh')) {
+      console.log('Refresh is not expired');
       HSEAuthService.requestAccessData('refresh_token', {
         refresh_token: Vault.getToken('refresh').token,
       })
@@ -77,6 +80,7 @@ export class HSEAuthService {
           throw error;
         });
     } else {
+      console.log('Refresh is expired');
       throw 'Need to request new refresh token';
     }
   }
@@ -92,7 +96,7 @@ export class HSEAuthService {
 
   public static isExpiredToken(tokenType: 'access' | 'refresh'): boolean {
     const token = Vault.getToken(tokenType);
-    return token.retrieved_at.getTime() + token.expires_in > new Date().getTime();
+    return token.retrieved_at.getTime() + token.expires_in * 1000 < new Date().getTime();
   }
 
   private static getURLEncodedParams(
@@ -118,7 +122,7 @@ export class HSEAuthService {
     shell.openExternal(HSEAuthService.getStdAuthURL());
   }
 
-  public static async authorize() {
+  public static authorize() {
     return new Promise<boolean>((resolve, reject) => {
       if (HSEAuthService.isAuthorized()) {
         resolve(true);
@@ -126,7 +130,8 @@ export class HSEAuthService {
         HSEAuthService.refreshAccessData()
           .then(() => resolve(true))
           .catch((_) => {
-            InternalEventEmitter.emitAuthEvent();
+            // console.log(_);
+            // InternalEventEmitter.emitAuthEvent();
             reject(false);
           });
       }

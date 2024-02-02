@@ -1,24 +1,28 @@
 import Store from 'electron-store';
 import { safeStorage } from 'electron';
-import type { AccessData, Token } from '../types';
+import { isAccessData, type AccessData, type RefreshData, type Token } from '../types';
 import { SECRET_KEY } from '../config';
 
 export class Vault {
   protected static store = new Store({
     encryptionKey: SECRET_KEY,
     name: 'auth-store',
+    watch: true,
   });
 
-  public static saveAccessData(data: AccessData) {
-    const { access_token, refresh_token, refresh_token_expires_in, expires_in, id_token } = data;
+  public static saveAccessData(data: AccessData | RefreshData) {
+    const { access_token, expires_in, id_token } = data;
+    if (isAccessData(data)) {
+      const { refresh_token, refresh_token_expires_in } = data;
+      Vault.store.set('refresh_expires', refresh_token_expires_in);
+      Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
+      Vault.store.set('refresh_retrieved', new Date().getTime());
+    }
 
     Vault.store.set('access_token', safeStorage.encryptString(access_token).toString('latin1'));
-    Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
-    Vault.store.set('id_token', safeStorage.encryptString(id_token).toString('latin1'));
     Vault.store.set('access_expires', expires_in);
-    Vault.store.set('refresh_expires', refresh_token_expires_in);
     Vault.store.set('access_retrieved', new Date().getTime());
-    Vault.store.set('refresh_retrieved', new Date().getTime());
+    Vault.store.set('id_token', safeStorage.encryptString(id_token).toString('latin1'));
   }
 
   public static getToken(tokenType: 'access' | 'refresh'): Token {

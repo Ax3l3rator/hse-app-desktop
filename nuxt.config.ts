@@ -1,6 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import readFileSync from 'fs';
-import resolve from 'path';
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 
 export default defineNuxtConfig({
@@ -61,7 +59,6 @@ export default defineNuxtConfig({
   app: {
     baseURL: './',
   },
-  pages: true,
   // nitro: {
   //   routeRules: {
   //     '/*': { cors: true },
