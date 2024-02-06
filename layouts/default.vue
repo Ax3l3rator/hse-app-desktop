@@ -15,7 +15,7 @@
               <v-skeleton-loader class="ma-0 pa-0" type="avatar"></v-skeleton-loader>
             </v-avatar>
           </template>
-          <v-skeleton-loader type="list-item"></v-skeleton-loader>
+          <v-skeleton-loader width="135" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
         <v-list-item
           lines="two"
@@ -42,7 +42,7 @@
           <template v-slot:prepend>
             <v-skeleton-loader width="24" height="24"></v-skeleton-loader>
           </template>
-          <v-skeleton-loader type="list-item"></v-skeleton-loader>
+          <v-skeleton-loader width="167" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
         <v-list-item
           v-for="element of menuElements"
@@ -61,7 +61,7 @@
             <template v-slot:prepend>
               <v-skeleton-loader width="24" height="24"></v-skeleton-loader>
             </template>
-            <v-skeleton-loader type="list-item" elevation="3"></v-skeleton-loader>
+            <v-skeleton-loader width="167" height="12" elevation="3" class="ml-4 rounded-xl"></v-skeleton-loader>
           </v-list-item>
           <v-list-item
             @click="leave"
@@ -83,36 +83,42 @@
         </v-list>
       </template>
     </v-navigation-drawer>
-
-    <v-main>
-      <div id="pinned" class="pl-5 pr-3">
-        <div>
-          <v-breadcrumbs
-            id="breads-pinned"
-            :items="breadcrumbsItems"
-            density="compact"
-            :class="scrollY > 10 ? 'elevation-6 rounded-b-lg' : 'elevation-0'"
-            class="py-4 text-h6 text-capitalize"
-            color="primary"
-          >
-          </v-breadcrumbs>
-        </div>
+    <v-main ref="pageElement">
+      <div class="pl-5 pr-3" id="pinned">
+        <v-toolbar
+          class="mx-auto bg-background"
+          :class="scrollY > 10 ? 'elevation-6 rounded-b-lg' : 'elevation-0'"
+          :height="breadsHeight"
+          flat
+        >
+          <div ref="breads">
+            <v-breadcrumbs
+              id="breads-pinned"
+              :items="breadcrumbsItems"
+              density="compact"
+              class="py-4 text-h6 text-capitalize"
+              color="primary"
+            >
+            </v-breadcrumbs>
+          </div>
+        </v-toolbar>
       </div>
-
-      <div class="pr-5 pl-7 py-4" ref="el">
+      <div class="pr-5 pl-7 py-4">
         <slot />
       </div>
-      {{ scrollY }}
-      {{ windowHeight }}
-      {{ elementSize }}
-      <div id="bottom-pinned" class="pl-5 pr-3">
-        <v-pagination
-          id="pagination-pinned"
-          density="comfortable"
-          :class="scrollY < windowHeight - 10 ? 'elevation-6 rounded-t-lg' : 'elevation-0'"
-        ></v-pagination>
-      </div>
     </v-main>
+    <v-footer app class="bg-transparent pa-0 d-block" id="footer" ref="footer">
+      <v-expand-transition>
+        <div id="bottom-pinned" class="pl-5 pr-3 mx-auto d-block" v-if="!hidePagination">
+          <v-pagination
+            id="pagination-pinned"
+            density="comfortable"
+            class="py-1"
+            :class="elevateFooter ? 'elevation-6 rounded-t-lg' : 'elevation-0'"
+          ></v-pagination>
+        </div>
+      </v-expand-transition>
+    </v-footer>
   </v-app>
 </template>
 
@@ -146,19 +152,29 @@ const menuElements = ref([
     to: '/students/3',
   },
 ]);
-const rail = ref(true);
+
 const loading = ref(true);
 const userData = ref<{ given_name: string; family_name: string; email: string } | undefined>();
-
+// rail related
+const windowWidth = useWindowSize().width;
+const rail = ref(true);
+const railEnabled = computed(() => windowWidth.value > 1000);
+// scroll related
 const scrollY = useWindowScroll().y;
 const windowHeight = useWindowSize().height;
-const windowWidth = useWindowSize().width;
-const railEnabled = computed(() => windowWidth.value > 1000);
+// footer related
+const footer = ref(null);
+const footerHeight = useElementSize(footer).height;
+const pageElement = ref(null);
+const elementSize = useElementSize(pageElement).height;
+const documentHeight = computed(() => Number(elementSize.value.toFixed()) + Number(footerHeight.value.toFixed()));
+const elevateFooter = computed(() => documentHeight.value - windowHeight.value - scrollY.value > 10);
+// breads related
+const breads = ref(null);
+const breadsHeight = useElementSize(breads).height;
+// navigation and nuxt
 const route = useRoute();
-
-const el = ref(null);
-const elementSize = useElementSize(el).height;
-
+const hidePagination = computed(() => !route.meta.showPagination);
 const breadcrumbsItems = computed(() => {
   return [
     ...route.fullPath
@@ -184,13 +200,10 @@ function leave() {
   navigateTo('unauthorized');
 }
 
-// onMounted(async () => {
 setTimeout(async () => {
   userData.value = await window.electronAPI.getUserInfo();
   loading.value = false;
 }, 1500);
-
-// });
 
 window.electronAPI.onLeave(() => {
   setPageLayout('default');

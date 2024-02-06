@@ -12,3 +12,10 @@ declare global {
     electronAPI: IElectronAPI;
   }
 }
+declare module '#app' {
+  interface PageMeta {
+    showPagination?: boolean;
+  }
+}
+
+export {};

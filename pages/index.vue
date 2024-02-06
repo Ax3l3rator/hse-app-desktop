@@ -11,17 +11,20 @@
 </template>
 
 <script setup>
-function docss() {
-  var themeColors = {};
-  Object.keys(this.$vuetify.theme.themes.dark).forEach((color) => {
-    themeColors[`--v-${color}`] = this.$vuetify.theme.themes.dark[color];
-  });
-  console.log(this.$vuetify.theme.themes);
-  console.log(themeColors);
-  return themeColors;
-}
+import { useTheme } from 'vuetify/lib/framework.mjs';
+definePageMeta({
+  showPagination: true,
+});
+const vuetify = useTheme();
 
-// const elevate = computed(() => useWindowScroll().y.value > 64);
+function docss() {
+  let themeColors = {};
+  const curColors = vuetify.current.value.colors;
+  for (let key in curColors) {
+    themeColors[`--v-theme-${key}`] = curColors[key];
+  }
+  console.log(themeColors);
+}
 </script>
 
 <style scoped></style>
