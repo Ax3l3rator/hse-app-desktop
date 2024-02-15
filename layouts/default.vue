@@ -24,12 +24,14 @@
           :subtitle="userData!.email"
         >
           <template v-slot:prepend>
-            <v-avatar color="primary">
+            <v-avatar :color="avatarURL ? 'transparent' : 'primary'">
               <v-icon
+                v-if="!avatarURL"
                 icon="mdi-account"
                 class="icon-resize"
                 :class="rail ? 'bounce-leave-active' : 'bounce-enter-active'"
               ></v-icon>
+              <v-img v-else :src="avatarURL"> </v-img>
             </v-avatar>
           </template>
         </v-list-item>
@@ -61,18 +63,18 @@
             <template v-slot:prepend>
               <v-skeleton-loader width="24" height="24"></v-skeleton-loader>
             </template>
-            <v-skeleton-loader width="167" height="12" elevation="3" class="ml-4 rounded-xl"></v-skeleton-loader>
+            <v-skeleton-loader width="167" height="12" elevation="3" class="ml-4 rounded-lg"></v-skeleton-loader>
           </v-list-item>
           <v-list-item
+            base-color="red"
             @click="leave"
             :elevation="!rail ? 3 : 0"
             id="leave-button"
-            prepend-icon="mdi-close"
-            class="text-red"
+            class="text-red rounded-lg"
             v-else
           >
-            <template v-slot:append>
-              <v-icon></v-icon>
+            <template v-slot:prepend>
+              <v-icon icon="mdi-close"></v-icon>
             </template>
             <!-- <template v-slot:title> <div class="d-block">ВЫЙТИ</div> </template> -->
             <!-- <template v-slot:default>
@@ -86,21 +88,38 @@
     <v-main ref="pageElement">
       <div class="pl-5 pr-3" id="pinned">
         <v-toolbar
-          class="mx-auto bg-background"
+          class="bg-background rounded-b-lg px-1"
           :class="scrollY > 10 ? 'elevation-6 rounded-b-lg' : 'elevation-0'"
-          :height="breadsHeight"
+          density="compact"
           flat
+          floating
         >
           <div ref="breads">
             <v-breadcrumbs
-              id="breads-pinned"
               :items="breadcrumbsItems"
               density="compact"
-              class="py-4 text-h6 text-capitalize"
-              color="primary"
+              class="d-block text-h6 text-capitalize"
+              color="primary-lighten-1"
             >
             </v-breadcrumbs>
           </div>
+
+          <v-spacer></v-spacer>
+
+          <!-- <v-btn icon="mdi-close"></v-btn> -->
+          <template v-slot:append>
+            <v-toolbar-items>
+              <v-divider vertical inset class="mr-4"></v-divider>
+            </v-toolbar-items>
+            <v-btn @click="toggleTheme" density="compact" icon color="surface-variant">
+              <v-scale-transition hide-on-leave>
+                <v-icon v-if="!theme.global.current.value.dark"> mdi-weather-night</v-icon>
+              </v-scale-transition>
+              <v-scale-transition hide-on-leave>
+                <v-icon v-if="theme.global.current.value.dark">mdi-weather-sunny</v-icon>
+              </v-scale-transition>
+            </v-btn>
+          </template>
         </v-toolbar>
       </div>
       <div class="pr-5 pl-7 py-4">
@@ -112,8 +131,8 @@
         <div id="bottom-pinned" class="pl-5 pr-3 mx-auto d-block" v-if="!hidePagination">
           <v-pagination
             id="pagination-pinned"
-            density="comfortable"
-            class="py-1"
+            density="compact"
+            class="py-1 bg-background"
             :class="elevateFooter ? 'elevation-6 rounded-t-lg' : 'elevation-0'"
           ></v-pagination>
         </div>
@@ -123,6 +142,20 @@
 </template>
 
 <script setup lang="ts">
+import { useTheme } from 'vuetify/lib/framework.mjs';
+
+// theme
+const theme = useTheme();
+const themeName = ref('dark');
+
+watch(themeName, () => {
+  theme.global.name.value = themeName.value;
+});
+
+function toggleTheme() {
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
+}
+
 const routerNames = ref(
   new Map<string, string>([
     ['', 'расписание'],
@@ -171,10 +204,12 @@ const documentHeight = computed(() => Number(elementSize.value.toFixed()) + Numb
 const elevateFooter = computed(() => documentHeight.value - windowHeight.value - scrollY.value > 10);
 // breads related
 const breads = ref(null);
-const breadsHeight = useElementSize(breads).height;
+// const breadsHeight = useElementSize(breads).height;
 // navigation and nuxt
 const route = useRoute();
 const hidePagination = computed(() => !route.meta.showPagination);
+const avatarURL = ref(null);
+
 const breadcrumbsItems = computed(() => {
   return [
     ...route.fullPath
@@ -205,6 +240,8 @@ setTimeout(async () => {
   loading.value = false;
 }, 1500);
 
+avatarURL.value = (await window.electronAPI.getFullUserInfo()).avatar_url;
+
 window.electronAPI.onLeave(() => {
   setPageLayout('default');
   navigateTo('unauthorized');
@@ -226,10 +263,6 @@ window.electronAPI.onLeave(() => {
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-#breads-pinned {
-  background: rgba(var(--v-theme-background));
 }
 :deep(.v-navigation-drawer__content::-webkit-scrollbar) {
   display: none;
@@ -266,15 +299,13 @@ window.electronAPI.onLeave(() => {
   z-index: 1;
 }
 
-#pagination-pinned {
-  background: rgba(var(--v-theme-background));
-}
-
 #pagination-pinned.elevation-6.rounded-t-lg {
-  transition: all 0.5s;
+  transition: border-radius 1s;
+  transition: box-shadow 1s;
 }
 
 #pagination-pinned.elevation-0 {
-  transition: all 0.2s;
+  transition: border-radius 0.2s;
+  transition: box-shadow 0.2s;
 }
 </style>

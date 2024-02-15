@@ -3,6 +3,7 @@ export interface IElectronAPI {
   checkIfAuthorized: () => Promise<boolean>;
   leave: () => Promise<void>;
   getUserInfo: () => Promise<any>;
+  getFullUserInfo: () => Promise<any>;
   onAuthorize: (callback: (...args: any[]) => void) => Promise<void>;
   onLeave: (callback: (...args: any[]) => void) => Promise<void>;
 }

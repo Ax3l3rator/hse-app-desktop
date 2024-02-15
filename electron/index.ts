@@ -58,7 +58,7 @@ app
         return false;
       }
     });
-
+    ipcMain.handle('get-full-user-info', () => HSEAuthService.getFullUserInfo());
     ipcMain.handle('get-user-info', () => HSEAuthService.getUserInfo());
     ipcMain.handle('reset-tokens', HSEAuthService.leave);
     restoreOrCreateWindow();

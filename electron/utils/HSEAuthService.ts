@@ -142,6 +142,39 @@ export class HSEAuthService {
     return jwt.decode(Vault.getIDToken(), { complete: true })?.payload;
   }
 
+  public static getFullUserInfo() {
+    return new Promise<any>((resolve, reject) => {
+      const request = net.request({
+        url: 'https://dev.hseapp.ru/v3/dump/me',
+        method: 'GET',
+      });
+      const accessToken = Vault.getToken('access');
+      console.log(accessToken);
+      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
+      request.on('response', (response) => {
+        const data: Buffer[] = [];
+        response.on('data', (chunk) => {
+          data.push(chunk);
+        });
+        response.on('end', () => {
+          const responseData = JSON.parse(Buffer.concat(data).toString());
+          console.log(responseData);
+          resolve(responseData);
+        });
+        response.on('error', (err: Error) => {
+          console.error(err);
+        });
+      });
+
+      request.on('error', (error: Error) => {
+        console.error(error);
+        reject(error);
+      });
+
+      request.end();
+    });
+  }
+
   public static leave() {
     Vault.resetTokens();
     sendLeaveEvent();

@@ -8,25 +8,22 @@ export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
     theme: {
       defaultTheme: 'dark',
-      themes: {
-        dark: {
-          dark: true,
-          colors: {
-            primary: colors.blue.base,
-            'primary-lighten-1': colors.blue.lighten1,
-            'primary-darken-1': colors.blue.darken1,
-          },
-        },
-        light: {
-          dark: false,
-          colors: {
-            primary: colors.blue.base,
-            'primary-lighten-1': colors.blue.lighten1,
-            'primary-darken-1': colors.blue.darken1,
-          },
-        },
-      },
-    },
+    }, // {
+    // defaultTheme: 'dark',
+    // themes: {
+    //   dark: {
+    //     dark: true,
+    //   },
+    //   light: {
+    //     dark: false,
+    //     // colors: {
+    //     // primary: colors.blue.darken2,
+    //     // 'primary-lighten-1': colors.blue.darken1,
+    //     // 'primary-darken-1': colors.blue.darken3,
+    //     // },
+    //   },
+    // },
+    // },
   });
   app.vueApp.use(vuetify);
 });

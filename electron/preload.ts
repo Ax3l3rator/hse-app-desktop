@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkIfAuthorized: async () => ipcRenderer.invoke('check-authorization'),
   leave: async () => await ipcRenderer.invoke('reset-tokens'),
   getUserInfo: async () => await ipcRenderer.invoke('get-user-info'),
+  getFullUserInfo: async () => await ipcRenderer.invoke('get-full-user-info'),
   onAuthorize: async (callback: (...args: any[]) => void) =>
     ipcRenderer.on('authorize', (_event, value) => callback(value)),
   onLeave: async (callback: (...args: any[]) => void) => ipcRenderer.on('leave', (_event, value) => callback(value)),
