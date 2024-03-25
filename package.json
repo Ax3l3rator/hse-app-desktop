@@ -1,5 +1,6 @@
 {
   "name": "hse-app-desktop",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "build": "nuxt build --prerender && electron-builder",
@@ -30,7 +31,6 @@
     "vue-router": "^4.2.5"
   },
   "main": "dist-electron/index.js",
-  "version": "1.0.0",
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "^0.5.1",

@@ -1,3 +1,3 @@
 # HSE DESKTOP APP
 
-Скачать: https://github.com/Ax3l3rator/hse-app-desktop/releases/download/Alpha/HSE.App.Desktop_1.0.0.exe
+Скачать c [google-drive](https://drive.google.com/file/d/1lTqjYoYlGT34fHJYmBcp18uKWSEtnNfR/view?usp=sharing)
