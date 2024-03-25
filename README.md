@@ -1,6 +1,6 @@
-# Nuxt 3 Minimal Starter
+# HSE DESKTOP APP
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Скачать: https://github.com/Ax3l3rator/hse-app-desktop/releases/download/Alpha/HSE.App.Desktop_1.0.0.exe
 
 ## Setup
 
