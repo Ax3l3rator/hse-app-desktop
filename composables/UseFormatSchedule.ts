@@ -40,7 +40,9 @@ export default function (objectArray: Ref<RawScheduleElement[]>): { [key: string
     const dateStamp = `${dateObj.getFullYear()}-${dateObj.getMonth() + 1}-${dateObj.getDate()}`;
     const addObject: ScheduleElement = {
       name: `${lesson.discipline}`,
-      teacher: `${lesson.lecturer_profiles[0].description} ${lesson.lecturer_profiles[0].full_name}`,
+      teacher: lesson.lecturer_profiles[0]
+        ? `${lesson.lecturer_profiles[0].description} ${lesson.lecturer_profiles[0].full_name}`
+        : undefined,
       place: `${lesson.auditorium}, ${lesson.building}`,
       pair: lesson.lesson_number_start,
       type: `${lesson.kindOfWork}`,

@@ -174,7 +174,7 @@ export class HSEAuthService {
       });
       const accessToken = Vault.getToken('access');
       request.setHeader('Authorization', `Bearer ${accessToken.token}`);
-      request.setHeader('Accept-Language', 'ru');
+      request.setHeader('Accept-Language', 'ru-FI;q=1.0 en-GB;q=0.9');
       request.on('response', (response) => {
         const data: Buffer[] = [];
         response.on('data', (chunk) => {

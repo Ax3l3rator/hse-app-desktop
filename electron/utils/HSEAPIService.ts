@@ -9,7 +9,7 @@ export class HSEAPIService {
         resolve([]);
       }
       const request = net.request({
-        url: `https://dev.hseapp.ru/v3/dump/search?q=${query}${type === 'ALL' ? '' : `&type=${type}`}`,
+        url: `https://api.hseapp.ru/v3/dump/search?q=${query}${type === 'ALL' ? '' : `&type=${type}`}`,
         method: 'GET',
       });
 
@@ -42,7 +42,7 @@ export class HSEAPIService {
   public static async getNameByEmail(email: string) {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
-        url: `https://dev.hseapp.ru/v3/dump/email/${encodeURIComponent(email)}`,
+        url: `https://api.hseapp.ru/v3/dump/email/${encodeURIComponent(email)}`,
         method: 'GET',
       });
       const accessToken = Vault.getToken('access');
@@ -74,7 +74,7 @@ export class HSEAPIService {
   public static async getFullPersonInfo(email: string) {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
-        url: `https://dev.hseapp.ru/v3/dump/email/${email}`,
+        url: `https://api.hseapp.ru/v3/dump/email/${email}`,
         method: 'GET',
       });
       const accessToken = Vault.getToken('access');
@@ -106,7 +106,7 @@ export class HSEAPIService {
   public static async getBuildings() {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
-        url: `https://dev.hseapp.ru/v3/dump/buildings/groups`,
+        url: `https://api.hseapp.ru/v3/dump/buildings/groups`,
         method: 'POST',
       });
       const accessToken = Vault.getToken('access');
@@ -139,7 +139,7 @@ export class HSEAPIService {
   public static async getFreeAuditoriums(building_id: number, date_from: string, date_to: string) {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
-        url: `https://dev.hseapp.ru/rooms/free`,
+        url: `https://api.hseapp.ru/rooms/free`,
         method: 'POST',
       });
       const accessToken = Vault.getToken('access');

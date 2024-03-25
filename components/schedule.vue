@@ -57,7 +57,7 @@
                               <v-chip prepend-icon="mdi-map-marker" size="small" class="mx-1 mt-1">
                                 {{ lesson.place }}
                               </v-chip>
-                              <v-chip prepend-icon="mdi-account-school" size="small" class="mt-1">
+                              <v-chip v-if="lesson.teacher" prepend-icon="mdi-account-school" size="small" class="mt-1">
                                 {{ lesson.teacher }}
                               </v-chip>
                             </div>

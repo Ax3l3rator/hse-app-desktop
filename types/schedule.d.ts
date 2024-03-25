@@ -41,7 +41,7 @@ export type Location = {
 
 export type ScheduleElement = {
   name: string;
-  teacher: string;
+  teacher: string | undefined;
   pair: number;
   place: string;
   type: string;
