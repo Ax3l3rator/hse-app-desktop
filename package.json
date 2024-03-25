@@ -30,10 +30,12 @@
     "vue-router": "^4.2.5"
   },
   "main": "dist-electron/index.js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "vuetify": "^3.4.10"
+    "@pinia/nuxt": "^0.5.1",
+    "pinia": "^2.1.7",
+    "vuetify": "3.4.11"
   },
   "resolutions": {
     "jackspeak": "2.1.1"

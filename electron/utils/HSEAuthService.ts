@@ -1,7 +1,6 @@
 import { net, shell } from 'electron';
 import { isAccessData, isRefreshData } from '../types';
 import { CLIENT_ID } from '../config';
-import * as jwt from 'jsonwebtoken';
 import { Vault } from './Vault';
 import type { AccessData, RefreshData } from '../types';
 // import { InternalEventEmitter } from './InternalEventEmitter';
@@ -20,9 +19,11 @@ export class HSEAuthService {
   ) {
     return new Promise<AccessData | RefreshData>((resolve, reject) => {
       const request = net.request({
-        url: 'https://auth.hse.ru/adfs/oauth2/token/',
+        url: 'https://saml.hse.ru/realms/hse/protocol/openid-connect/token/',
         method: 'POST',
       });
+
+      request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
       request.on('response', (response) => {
         const data: Buffer[] = [];
@@ -69,7 +70,6 @@ export class HSEAuthService {
 
   public static async refreshAccessData() {
     if (!HSEAuthService.isExpiredToken('refresh')) {
-      console.log('Refresh is not expired');
       HSEAuthService.requestAccessData('refresh_token', {
         refresh_token: Vault.getToken('refresh').token,
       })
@@ -80,7 +80,6 @@ export class HSEAuthService {
           throw error;
         });
     } else {
-      console.log('Refresh is expired');
       throw 'Need to request new refresh token';
     }
   }
@@ -109,20 +108,19 @@ export class HSEAuthService {
       grant_type,
       ...additional_data,
     };
-
     const urlEncodedParams = new URLSearchParams(params).toString();
     return urlEncodedParams;
   }
 
   private static getStdAuthURL() {
-    return `https://auth.hse.ru/adfs/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=ruz-app-fiddle://auth.hse.ru/adfs/oauth2/callback`;
+    return `https://saml.hse.ru/realms/hse/protocol/openid-connect/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=ruz-app-fiddle://auth.hse.ru/adfs/oauth2/callback`;
   }
 
   public static openAuthBrowserExternal() {
     shell.openExternal(HSEAuthService.getStdAuthURL());
   }
 
-  public static authorize() {
+  public static async authorize() {
     return new Promise<boolean>((resolve, reject) => {
       if (HSEAuthService.isAuthorized()) {
         resolve(true);
@@ -130,27 +128,21 @@ export class HSEAuthService {
         HSEAuthService.refreshAccessData()
           .then(() => resolve(true))
           .catch((_) => {
-            // console.log(_);
-            // InternalEventEmitter.emitAuthEvent();
             reject(false);
           });
       }
     });
   }
 
-  public static getUserInfo() {
-    return jwt.decode(Vault.getIDToken(), { complete: true })?.payload;
-  }
-
-  public static getFullUserInfo() {
+  public static async getFullUserInfo() {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
         url: 'https://dev.hseapp.ru/v3/dump/me',
         method: 'GET',
       });
       const accessToken = Vault.getToken('access');
-      console.log(accessToken);
       request.setHeader('Authorization', `Bearer ${accessToken.token}`);
+      request.setHeader('Accept-Language', 'ru');
       request.on('response', (response) => {
         const data: Buffer[] = [];
         response.on('data', (chunk) => {
@@ -158,7 +150,38 @@ export class HSEAuthService {
         });
         response.on('end', () => {
           const responseData = JSON.parse(Buffer.concat(data).toString());
-          console.log(responseData);
+          resolve(responseData);
+        });
+        response.on('error', (err: Error) => {
+          console.error('An error response:', err);
+        });
+      });
+
+      request.on('error', (error: Error) => {
+        console.error(error);
+        reject(error);
+      });
+
+      request.end();
+    });
+  }
+
+  public static getSchedule(email: string) {
+    return new Promise<any>((resolve, reject) => {
+      const request = net.request({
+        url: `https://api.hseapp.ru/v3/ruz/lessons?email=${encodeURIComponent(email)}`,
+        method: 'GET',
+      });
+      const accessToken = Vault.getToken('access');
+      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
+      request.setHeader('Accept-Language', 'ru');
+      request.on('response', (response) => {
+        const data: Buffer[] = [];
+        response.on('data', (chunk) => {
+          data.push(chunk);
+        });
+        response.on('end', () => {
+          const responseData = JSON.parse(Buffer.concat(data).toString());
           resolve(responseData);
         });
         response.on('error', (err: Error) => {

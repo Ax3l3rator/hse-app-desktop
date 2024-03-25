@@ -17,12 +17,13 @@
           </template>
           <v-skeleton-loader width="135" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
-        <v-list-item
-          lines="two"
-          v-else
-          :title="`${userData!.given_name} ${userData!.family_name}`"
-          :subtitle="userData!.email"
-        >
+        <v-list-item lines="two" v-else>
+          <v-list-item-title>
+            {{ `${userData!.names.first_name} ${userData!.names.last_name}` }}
+          </v-list-item-title>
+          <v-list-item-subtitle class="text-truncate">
+            {{ userData?.email }}
+          </v-list-item-subtitle>
           <template v-slot:prepend>
             <v-avatar :color="avatarURL ? 'transparent' : 'primary'">
               <v-icon
@@ -31,7 +32,7 @@
                 class="icon-resize"
                 :class="rail ? 'bounce-leave-active' : 'bounce-enter-active'"
               ></v-icon>
-              <v-img v-else :src="avatarURL"> </v-img>
+              <v-img draggable="false" v-else :src="avatarURL"> </v-img>
             </v-avatar>
           </template>
         </v-list-item>
@@ -98,7 +99,7 @@
             <v-breadcrumbs
               :items="breadcrumbsItems"
               density="compact"
-              class="d-block text-h6 text-capitalize"
+              class="d-block text-h6"
               color="primary-lighten-1"
             >
             </v-breadcrumbs>
@@ -122,7 +123,7 @@
           </template>
         </v-toolbar>
       </div>
-      <div class="pr-5 pl-7 py-4">
+      <div class="pr-5 pl-7">
         <slot />
       </div>
     </v-main>
@@ -143,10 +144,12 @@
 
 <script setup lang="ts">
 import { useTheme } from 'vuetify/lib/framework.mjs';
+import { useUserStore } from '~/store/pinia';
 
 // theme
 const theme = useTheme();
 const themeName = ref('dark');
+const userStore = useUserStore();
 
 watch(themeName, () => {
   theme.global.name.value = themeName.value;
@@ -158,11 +161,11 @@ function toggleTheme() {
 
 const routerNames = ref(
   new Map<string, string>([
-    ['', 'расписание'],
-    ['search', 'поиск'],
-    ['students', 'студенты'],
-    ['auditoriums', 'аудитории'],
-    ['teachers', 'сотрудники'],
+    ['', 'Расписание'],
+    ['search', 'Поиск'],
+    ['students', 'Студенты'],
+    ['free', 'Свободные Аудитории'],
+    ['teachers', 'Сотрудники'],
   ]),
 );
 const menuElements = ref([
@@ -179,15 +182,26 @@ const menuElements = ref([
     to: '/search',
   },
   {
-    icon: 'mdi-account-cog',
-    title: 'Настройки профиля',
+    icon: 'mdi-door-open',
+    title: 'Свободные аудитории',
     value: 'user-settings',
-    to: '/students/3',
+    to: '/free',
   },
 ]);
 
 const loading = ref(true);
-const userData = ref<{ given_name: string; family_name: string; email: string } | undefined>();
+const userData = ref<
+  | {
+      names: {
+        first_name: string;
+        last_name: string;
+        middle_name: string;
+      };
+      email: string;
+      avatar_url: string;
+    }
+  | undefined
+>();
 // rail related
 const windowWidth = useWindowSize().width;
 const rail = ref(true);
@@ -208,7 +222,7 @@ const breads = ref(null);
 // navigation and nuxt
 const route = useRoute();
 const hidePagination = computed(() => !route.meta.showPagination);
-const avatarURL = ref(null);
+const avatarURL = ref('');
 
 const breadcrumbsItems = computed(() => {
   return [
@@ -218,8 +232,8 @@ const breadcrumbsItems = computed(() => {
       .map((eve) => {
         if (!routerNames.value.has(eve)) {
           for (const param in useRoute().params) {
-            if (param == 'id') {
-              return `id-${useRoute().params[param]}`;
+            if (param == 'email') {
+              return useRoute().params[param] as string;
             }
           }
         }
@@ -236,11 +250,11 @@ function leave() {
 }
 
 setTimeout(async () => {
-  userData.value = await window.electronAPI.getUserInfo();
+  userData.value = await window.electronAPI.getFullUserInfo();
+  avatarURL.value = userData.value!.avatar_url;
+  userStore.email = userData.value!.email;
   loading.value = false;
 }, 1500);
-
-avatarURL.value = (await window.electronAPI.getFullUserInfo()).avatar_url;
 
 window.electronAPI.onLeave(() => {
   setPageLayout('default');

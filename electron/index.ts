@@ -5,6 +5,8 @@ import { platform } from 'node:process';
 import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
 import { InternalEventEmitter } from './utils/InternalEventEmitter';
+import { HSEAPIService } from './utils/HSEAPIService';
+import type { SearchType } from '~/types/search';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -34,7 +36,7 @@ app.on('second-instance', async (event, commandLine) => {
         await sendAuthEvent();
       }, 1000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   } else throw new Error('Unknown');
 });
@@ -58,9 +60,22 @@ app
         return false;
       }
     });
-    ipcMain.handle('get-full-user-info', () => HSEAuthService.getFullUserInfo());
-    ipcMain.handle('get-user-info', () => HSEAuthService.getUserInfo());
+    ipcMain.handle('get-full-user-info', async () => await HSEAuthService.getFullUserInfo());
     ipcMain.handle('reset-tokens', HSEAuthService.leave);
+    ipcMain.handle('get-student-schedule', async (event, email) => await HSEAuthService.getSchedule(email));
+    ipcMain.handle('get-search-results', (event, query: string, type: SearchType) =>
+      HSEAPIService.requestSearchResults(query, type).then((res) => {
+        event.sender.send('search-results-arrived', res);
+      }),
+    );
+    ipcMain.handle('get-name-by-email', async (event, email) => await HSEAPIService.getNameByEmail(email));
+    ipcMain.handle('get-full-person-info', async (event, email) => await HSEAPIService.getFullPersonInfo(email));
+    ipcMain.handle('get-buildings', async () => await HSEAPIService.getBuildings());
+    ipcMain.handle('get-free-auditoriums', (event, building_id, date_from, date_to) =>
+      HSEAPIService.getFreeAuditoriums(building_id, date_from, date_to).then((res) => {
+        event.sender.send('free-auditoriums-arrived', res);
+      }),
+    );
     restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

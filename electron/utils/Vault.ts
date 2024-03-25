@@ -11,10 +11,10 @@ export class Vault {
   });
 
   public static saveAccessData(data: AccessData | RefreshData) {
-    const { access_token, expires_in, id_token } = data;
+    const { access_token, expires_in } = data;
     if (isAccessData(data)) {
-      const { refresh_token, refresh_token_expires_in } = data;
-      Vault.store.set('refresh_expires', refresh_token_expires_in);
+      const { refresh_token, refresh_expires_in } = data;
+      Vault.store.set('refresh_expires', refresh_expires_in);
       Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
       Vault.store.set('refresh_retrieved', new Date().getTime());
     }
@@ -22,7 +22,6 @@ export class Vault {
     Vault.store.set('access_token', safeStorage.encryptString(access_token).toString('latin1'));
     Vault.store.set('access_expires', expires_in);
     Vault.store.set('access_retrieved', new Date().getTime());
-    Vault.store.set('id_token', safeStorage.encryptString(id_token).toString('latin1'));
   }
 
   public static getToken(tokenType: 'access' | 'refresh'): Token {
@@ -46,21 +45,18 @@ export class Vault {
     return { token: decrypted_token, expires_in, retrieved_at };
   }
 
-  public static getIDToken() {
-    const token = Vault.store.get('id_token') as string;
-    if (!token) {
-      throw new Error('No id token in database');
-    }
-    return safeStorage.decryptString(Buffer.from(token, 'latin1'));
-  }
-
   public static resetTokens() {
     Vault.store.delete('access_token');
     Vault.store.delete('refresh_token');
-    Vault.store.delete('id_token');
     Vault.store.delete('access_expires');
     Vault.store.delete('refresh_expires');
     Vault.store.delete('access_retrieved');
     Vault.store.delete('refresh_retrieved');
   }
+
+  public static setUserData(json: string) {
+    Vault.store.set('user_data', json);
+  }
+
+  public static getUserData() {}
 }
