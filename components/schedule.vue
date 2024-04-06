@@ -42,13 +42,12 @@
                         <div>
                           <v-card-title>
                             {{ lesson.name }}
+                            <v-tooltip v-if="lessons.length > 1" text="Несколько пар в это время">
+                              <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" icon="mdi-alert-circle" color="warning" size="small"> </v-icon>
+                              </template>
+                            </v-tooltip>
                           </v-card-title>
-                          <v-card-subtitle v-if="lessons.length > 1">
-                            <v-chip prepend-icon="mdi-alert-circle" color="warning" density="comfortable">
-                              Несколько пар в это время
-                            </v-chip>
-                          </v-card-subtitle>
-
                           <v-card-text>
                             <div class="text-medium-emphasis">
                               <v-chip prepend-icon="mdi-school" size="small" class="mt-1">

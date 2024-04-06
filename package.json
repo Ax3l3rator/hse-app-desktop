@@ -1,9 +1,9 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
-    "build": "nuxt build --prerender && electron-builder",
+    "build": "nuxt build && electron-builder",
     "dev": "nuxt dev",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
@@ -69,6 +69,10 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": false
-    }
+    },
+    "files": [
+      ".output/**/*",
+      "dist-electron"
+    ]
   }
 }
