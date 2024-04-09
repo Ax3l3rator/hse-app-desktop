@@ -137,7 +137,7 @@ export class HSEAuthService {
   public static async getFullUserInfo() {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
-        url: 'https://dev.hseapp.ru/v3/dump/me',
+        url: 'https://api.hseapp.ru/v3/dump/me',
         method: 'GET',
       });
       const accessToken = Vault.getToken('access');
