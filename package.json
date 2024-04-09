@@ -2,6 +2,12 @@
   "name": "hse-app-desktop",
   "version": "1.0.4",
   "private": true,
+  "author": {
+    "name": "Alex Koledae",
+    "email": "work.ax3l3rator@gmail.com",
+    "url": "https://github.com/Ax3l3rator"
+  },
+  "description": "Desktop app for HSE",
   "scripts": {
     "build": "nuxt build && electron-builder",
     "dev": "nuxt dev",
