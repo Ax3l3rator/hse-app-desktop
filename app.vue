@@ -6,6 +6,16 @@
   </div>
 </template>
 <style>
+/* .page-enter-active,
+.page-leave-active {
+  transition: all 0.2s;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  filter: blur(1rem);
+} */
+
 html,
 body {
   margin: 0;
@@ -20,21 +30,13 @@ div.content-holder {
 
 main {
   width: 100vw;
-  height: calc(100vh - 48px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
   overflow-x: hidden;
-  margin-top: 48px;
-  padding-top: 0 !important;
-  /* padding-bottom: 64px !important; */
-  /* background-color: black; */
-  /* padding-bottom: 0 !important; */
 }
 
-header {
-  display: block;
-}
 ::-webkit-scrollbar {
   width: 8px;
   cursor: pointer !important;

@@ -3,7 +3,7 @@ import type { AuditoriumsGrouped, AuditoriumsResult } from '~/types/auditoriums'
 export default function () {
   const results = ref<AuditoriumsResult>();
 
-  window.electronAPI.onFreeAuditoriumsResults((auditoriums: AuditoriumsGrouped) => {
+  window.ipcBridge.onFreeAuditoriumsResults((auditoriums: AuditoriumsGrouped) => {
     const foundCampuses = [
       ...auditoriums.rooms?.map((auditorium) => {
         if (auditorium.auditorium_building) {

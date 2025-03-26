@@ -54,7 +54,7 @@ onBeforeMount(async () => {
   setTimeout(() => {
     loading.value = false;
   }, 20000);
-  info.value = await window.electronAPI.getFullPersonInfo(props.email);
+  info.value = await window.ipcBridge.getFullPersonInfo(props.email);
 });
 
 function copyToClipBoard(query: string) {

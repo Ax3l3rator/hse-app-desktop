@@ -83,7 +83,7 @@ const months = [
 ];
 
 onBeforeMount(async () => {
-  info.value = await window.electronAPI.getFullPersonInfo(props.email);
+  info.value = await window.ipcBridge.getFullPersonInfo(props.email);
   if ('error' in info.value || !info.value) {
     cardAvailable.value = false;
   }

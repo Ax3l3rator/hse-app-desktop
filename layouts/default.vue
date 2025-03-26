@@ -17,7 +17,7 @@
           </template>
           <v-skeleton-loader width="135" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
-        <v-list-item lines="two" v-else>
+        <v-list-item density="compact" lines="two" v-else>
           <v-list-item-title>
             {{ `${userData!.names.first_name} ${userData!.names.last_name}` }}
           </v-list-item-title>
@@ -48,6 +48,7 @@
           <v-skeleton-loader width="167" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
         <v-list-item
+          rounded="lg"
           v-for="element of menuElements"
           v-else
           :key="element.value"
@@ -76,25 +77,22 @@
             <template v-slot:prepend>
               <v-icon icon="mdi-close"></v-icon>
             </template>
-            <!-- <template v-slot:title> <div class="d-block">ВЫЙТИ</div> </template> -->
-            <!-- <template v-slot:default>
-              <v-btn block class="text-red" variant="text" density="compact">ВЫЙТИ</v-btn>
-            </template> -->
             <div class="ml-7 unselectable">ВЫЙТИ</div>
           </v-list-item>
         </v-list>
       </template>
     </v-navigation-drawer>
-    <v-app-bar density="compact">
+
+    <v-app-bar density="comfortable" scroll-behavior="elevate" scroll-target="main">
       <template #prepend>
         <v-btn size="small" @click="router.back()" icon="mdi-arrow-left-circle"></v-btn>
       </template>
-      <div>
-        {{ useRoute().meta.title }}
-      </div>
-
+      <v-app-bar-title>
+        {{ page_name }}
+      </v-app-bar-title>
+      <v-progress-linear absolute location="bottom" :active="is_page_loading" indeterminate color="primary">
+      </v-progress-linear>
       <v-spacer></v-spacer>
-
       <template #append>
         <v-toolbar-items>
           <v-divider vertical inset class="mr-2"></v-divider>
@@ -108,50 +106,26 @@
           </v-scale-transition>
         </v-fab>
       </template>
-      <!-- <div class="pl-5 pr-3" id="pinned">
-        <v-toolbar
-          class="bg-background rounded-b-lg px-1"
-          :class="scrollY > 10 ? 'elevation-6 rounded-b-lg' : 'elevation-0'"
-          density="compact"
-          flat
-          floating
-        >
-
-        </v-toolbar>
-      </div> -->
     </v-app-bar>
-    <v-main ref="pageElement">
-      <div class="pr-5 pl-7 content-holder">
+    <v-main>
+      <div class="pr-5 pl-7">
         <slot />
       </div>
     </v-main>
-    <v-footer app class="bg-transparent pa-0 d-block" id="footer" ref="footer">
-      <v-expand-transition>
-        <div id="bottom-pinned" class="pl-5 pr-3 mx-auto d-block" v-if="!hidePagination">
-          <v-pagination
-            id="pagination-pinned"
-            density="compact"
-            class="py-1 bg-background"
-            :class="elevateFooter ? 'elevation-6 rounded-t-lg' : 'elevation-0'"
-          ></v-pagination>
-        </div>
-      </v-expand-transition>
-    </v-footer>
   </v-app>
 </template>
 
 <script setup lang="ts">
 import { useTheme } from 'vuetify';
-import { useUserStore } from '~/store/pinia';
+import { useUserStore } from '~/store/user';
+import { usePageStore } from '~/store/page';
 
-// theme
 const theme = useTheme();
 const themeName = ref('dark');
 const userStore = useUserStore();
 const router = useRouter();
-const historyCount = computed(() => {
-  return window.history.length;
-});
+
+const { page_name, is_page_loading } = storeToRefs(usePageStore());
 
 watch(themeName, () => {
   theme.global.name.value = themeName.value;
@@ -207,7 +181,7 @@ const menuElements = ref([
 ]);
 
 onMounted(() => {
-  if (!import.meta.dev) {
+  if (import.meta.dev) {
     menuElements.value.push({
       icon: 'mdi-test-tube',
       title: 'Тестовая страница',
@@ -230,115 +204,51 @@ const userData = ref<
     }
   | undefined
 >();
-// rail related
+
 const windowWidth = useWindowSize().width;
 const rail = ref(true);
 const railEnabled = computed(() => windowWidth.value > 1000);
-// scroll related
-const scrollY = useWindowScroll().y;
-const windowHeight = useWindowSize().height;
-// footer related
-const footer = ref(null);
-const footerHeight = useElementSize(footer).height;
-const pageElement = ref(null);
-const elementSize = useElementSize(pageElement).height;
-const documentHeight = computed(() => Number(elementSize.value.toFixed()) + Number(footerHeight.value.toFixed()));
-const elevateFooter = computed(() => documentHeight.value - windowHeight.value - scrollY.value > 10);
-
-// const breadsHeight = useElementSize(breads).height;
-// navigation and nuxt
-const route = useRoute();
-const hidePagination = computed(() => !route.meta.showPagination);
 const avatarURL = ref('');
 
-// // breads related
-
-// const routerNames = ref(
-//   new Map<string, string>([
-//     ['', 'Расписание'],
-//     ['search', 'Поиск'],
-//     ['students', 'Студенты'],
-//     ['free', 'Свободные Аудитории'],
-//     ['teachers', 'Сотрудники'],
-//   ]),
-// );
-// const breads = ref(null);
-// const breadcrumbsItems = computed(() => {
-//   return [
-//     ...route.fullPath
-//       .split('/')
-//       .slice(1)
-//       .map((eve: any) => {
-//         if (!routerNames.value.has(eve)) {
-//           for (const param in useRoute().params) {
-//             if (param == 'email') {
-//               return useRoute().params[param] as string;
-//             }
-//           }
-//         }
-//         return routerNames.value.get(eve) as string;
-//       }),
-//     '',
-//   ];
-// });
-
 function leave() {
-  window.electronAPI.leave();
-  setPageLayout('unauthorized');
+  window.ipcBridge.leave();
   navigateTo('unauthorized');
 }
 
 setTimeout(async () => {
-  userData.value = await window.electronAPI.getFullUserInfo();
+  userData.value = await window.ipcBridge.getFullUserInfo();
   avatarURL.value = userData.value!.avatar_url;
   userStore.email = userData.value!.email;
   userStore.full_name = `${userData.value?.names.last_name} ${userData.value?.names.first_name} ${userData.value?.names.middle_name}`;
   userStore.avatar_url = userData.value!.avatar_url;
   loading.value = false;
-}, 1500);
+}, 200);
 
-window.electronAPI.onLeave(() => {
-  setPageLayout('default');
+window.ipcBridge.onLeave(() => {
   navigateTo('unauthorized');
 });
 </script>
 
 <style scoped>
-.titlebar {
-  background-color: blue;
-  flex-shrink: 0;
-}
-
-#breads-pinned.elevation-6.rounded-b-lg {
-  transition: all 0.5s;
-}
-
-#breads-pinned.elevation-0 {
-  transition: all 0.2s;
-}
-
-#pinned {
-  /* background-color: rgba(var(--v-theme-surface-variant)); */
-  /* position: -webkit-sticky; */
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
 :deep(.v-navigation-drawer__content::-webkit-scrollbar) {
   display: none;
 }
+
 *.unselectable {
   user-select: none;
   -webkit-user-select: none;
 }
+
 .bounce-enter-active {
   transform: scale(1.666666667);
   transition: transform 0.2s;
 }
+
 .bounce-leave-active {
   transform: scale(1);
   transition: transform 0.2s;
 }
+
 .icon-resize {
   font-size: 16px;
 }
@@ -346,26 +256,8 @@ window.electronAPI.onLeave(() => {
 #leave-button.elevation-0 {
   transition: all 0.2s;
 }
+
 #leave-button.elevation-3 {
   transition: all 1s;
-}
-
-#bottom-pinned {
-  /* background-color: rgba(var(--v-theme-surface-variant)); */
-  /* position: -webkit-sticky; */
-  position: sticky;
-  bottom: 0;
-  /* top: 100%; */
-  z-index: 1;
-}
-
-#pagination-pinned.elevation-6.rounded-t-lg {
-  transition: border-radius 1s;
-  transition: box-shadow 1s;
-}
-
-#pagination-pinned.elevation-0 {
-  transition: border-radius 0.2s;
-  transition: box-shadow 0.2s;
 }
 </style>

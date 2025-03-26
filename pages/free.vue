@@ -1,24 +1,29 @@
 <template>
-  <v-container fluid class="pa-0 py-2 mt-2">
+  <v-container max-width="1280">
     <v-row>
       <v-col cols="3">
         <v-select
-          label="Кампус"
-          variant="outlined"
+          density="comfortable"
+          hide-details="auto"
           :items="campuses"
           item-title="name"
           item-value="id"
+          label="Кампус"
+          rounded="lg"
           return-object
+          variant="outlined"
           v-model="selectedCampus"
         >
         </v-select>
       </v-col>
-      <v-col>
+      <v-col cols="6">
         <v-select
+          density="comfortable"
           v-model="selected"
           variant="outlined"
           :items="itemsFiltered"
           item-title="name"
+          rounded="lg"
           item-value="id"
           label="Здание"
           return-object
@@ -31,31 +36,31 @@
           v-model="menu"
           :close-on-content-click="false"
           transition="scale-transition"
-          width="360"
-          max-width="360"
           contained
-          style="width: 360 !important"
+          rounded="lg"
         >
           <template #activator="{ props }">
             <v-text-field
+              density="comfortable"
               v-model="formattedDate"
               id="dateActivator"
               variant="outlined"
-              append-inner-icon="mdi-calendar"
               readonly
               class="cursor-pointer"
+              :class="mdAndUp ? '' : 'small-centered'"
               v-bind="props"
               label="Дата"
+              rounded="lg"
             >
             </v-text-field>
           </template>
           <v-date-picker
-            width="360"
             :min="currentDate"
             :max="maxDate"
             v-model="date"
             no-title
             scrollable
+            class="mt-2"
             color="primary"
             style="width: 100%"
           >
@@ -70,12 +75,14 @@
           min="1"
           max="7"
           step="1"
-          label="Интервал пар"
+          label="Интервал занятий:"
+          hide-details="auto"
           thumb-label="always"
+          density="comfortable"
           color="primary"
         >
           <template #append>
-            <div class="text-medium-emphasis pl-3">
+            <div class="opacity-60 pl-3">
               {{ Intl.DateTimeFormat('ru-RU', { timeStyle: 'short' }).format(dateFrom) }}-{{
                 Intl.DateTimeFormat('ru-RU', { timeStyle: 'short' }).format(dateTo)
               }}
@@ -84,34 +91,38 @@
         </v-range-slider>
       </v-col>
     </v-row>
+    <!-- <v-divider class="mb-2"></v-divider> -->
     <v-row justify="center" align="center" v-if="loading">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-row>
+
     <v-row v-else>
       <v-col>
-        <v-list v-if="auditoriums" class="rounded-lg">
-          <div v-for="(_, group, index) in auditoriums">
-            <v-list-subheader>
-              <div v-if="group != 'any'">КОРПУС {{ group }}</div>
-              <div v-else>ДРУГОЕ</div>
-            </v-list-subheader>
-            <v-divider></v-divider>
-            <div v-for="(room, i) in auditoriums[group]">
-              <v-list-item>
-                <v-list-item-title>
-                  {{ room.room }}
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ room.auditorium_type }}
-                </v-list-item-subtitle>
-                <v-divider
-                  class="mt-2"
-                  v-if="i != auditoriums[group].length - 1 && index != Object.keys(auditoriums).length - 1"
-                ></v-divider>
-              </v-list-item>
+        <v-card variant="outlined" rounded="lg">
+          <v-list v-if="auditoriums" class="rounded-lg" bg-color="background">
+            <div v-for="(_, group) in auditoriums">
+              <div v-if="Object.keys(auditoriums).length > 1">
+                <v-list-subheader>
+                  <div v-if="group != 'any'">КОРПУС {{ group }}</div>
+                  <div v-else>ДРУГОЕ</div>
+                </v-list-subheader>
+                <v-divider></v-divider>
+              </div>
+              <div v-for="(room, i) in auditoriums[group]">
+                <v-list-item>
+                  <v-list-item-title>
+                    {{ room.room }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle>
+                    {{ room.auditorium_type }}
+                  </v-list-item-subtitle>
+
+                  <v-divider class="mt-2" v-if="i != auditoriums[group].length - 1"></v-divider>
+                </v-list-item>
+              </div>
             </div>
-          </div>
-        </v-list>
+          </v-list>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -119,10 +130,12 @@
 
 <script setup lang="ts">
 import type { BuildingGrouped } from '~/types/buildings';
+import { useDisplay } from 'vuetify';
+import { usePageStore } from '~/store/page';
 
-definePageMeta({
-  title: 'Свободные аудитории',
-});
+usePageStore().page_name = 'Свободные аудитории';
+
+const { mdAndUp } = useDisplay();
 
 const menu = ref();
 const date = ref(new Date());
@@ -222,10 +235,11 @@ let timeout: NodeJS.Timeout;
 
 watch([selected, selectedCampus, date, rng], async ([selected, selectedCampus, date]) => {
   clearTimeout(timeout);
-  loading.value = true;
+
   timeout = setTimeout(async () => {
-    await window.electronAPI.getFreeAuditoriums(selected?.id, dateFrom.value.toISOString(), dateTo.value.toISOString());
-  }, 1000);
+    loading.value = true;
+    await window.ipcBridge.getFreeAuditoriums(selected?.id, dateFrom.value.toISOString(), dateTo.value.toISOString());
+  }, 200);
 });
 
 watch(auditoriums, async (auditoriums) => {
@@ -233,7 +247,11 @@ watch(auditoriums, async (auditoriums) => {
 });
 
 onBeforeMount(async () => {
-  buildings.value = await window.electronAPI.getBuildings();
+  buildings.value = await window.ipcBridge.getBuildings();
 });
 </script>
-<style></style>
+<style>
+.small-centered input {
+  text-align: center !important;
+}
+</style>

@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  ssr: false,
+  ssr: true,
 
   experimental: {
     appManifest: false, // set this to false, then the application starts working
@@ -72,6 +72,7 @@ export default defineNuxtConfig({
   // },
   app: {
     baseURL: './',
+    pageTransition: { name: 'page', mode: 'out-in' },
   },
 
   compatibilityDate: '2025-03-14',

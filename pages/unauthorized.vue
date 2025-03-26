@@ -9,7 +9,7 @@
         </v-row>
         <v-row no-gutters justify="center" align="center" class="mt-6">
           <v-col cols="8" class="d-flex justify-content-center">
-            <v-btn variant="tonal" color="primary mx-auto" block @click="authorize()"> Войти </v-btn>
+            <v-btn rounded="lg" variant="tonal" color="primary mx-auto" block @click="authorize()"> Войти </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -18,9 +18,9 @@
 </template>
 <script setup lang="ts">
 function authorize() {
-  window.electronAPI.authorizeViaBrowser();
+  window.ipcBridge.authorizeViaBrowser();
 }
-window.electronAPI.onAuthorize(async () => {
+window.ipcBridge.onAuthorize(async () => {
   await navigateTo('/');
 });
 </script>

@@ -104,15 +104,6 @@
 import type { ScheduleDay } from '~/types/schedule';
 
 const props = defineProps<{ email: string }>();
-// const vuetify = useTheme();
-// function docss() {
-//   let themeColors = {};
-//   const curColors = vuetify.current.value.colors;
-//   for (let key in curColors) {
-//     themeColors[`--v-theme-${key}`] = curColors[key];
-//   }
-//   console.log(themeColors);
-// }
 
 const pairToTime: { [key: number]: [string, string] } = {
   1: ['9:30', '10:50'],
@@ -126,20 +117,15 @@ const pairToTime: { [key: number]: [string, string] } = {
 
 const rawSchedule = ref([]);
 const schedule = ref<{ [key: string]: ScheduleDay }>();
-const loading = ref(false);
+const loading = ref(true);
 
 onBeforeMount(() => {
-  loading.value = true;
-  setTimeout(() => {
+  window.ipcBridge.getSchedule(props.email).then((res) => {
+    rawSchedule.value = res;
+    schedule.value = UseFormatSchedule(rawSchedule);
     loading.value = false;
-  }, 1000);
-  getSchedule();
+  });
 });
-
-async function getSchedule() {
-  rawSchedule.value = await window.electronAPI.getSchedule(props.email);
-  schedule.value = UseFormatSchedule(rawSchedule);
-}
 </script>
 
 <style scoped></style>

@@ -1,8 +1,10 @@
 <template>
-  <v-container fluid class="pa-0 py-2 mt-2">
+  <v-container max-width="1280">
     <v-row no-gutters>
       <v-col cols="4" class="pr-2">
         <v-select
+          density="comfortable"
+          hide-details="auto"
           v-model="select"
           return-object
           variant="outlined"
@@ -11,16 +13,19 @@
           item-value="type"
           placeholder="Категория"
           label="Категория"
+          rounded="lg"
         >
         </v-select>
       </v-col>
       <v-col cols="8" class="pl-2">
         <v-text-field
+          density="comfortable"
+          hide-details="auto"
           v-model.lazy="searchQuery"
           variant="outlined"
           prepend-inner-icon="mdi-magnify"
           label="Поиск"
-          :loading="loading"
+          rounded="lg"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -56,16 +61,26 @@
             <v-divider v-if="i != searchResults.length - 1"></v-divider>
           </div>
         </v-list>
+        <v-empty-state
+          v-else
+          :title="searchQuery.length && !is_before_loading ? 'Результатов нет' : 'Начните искать'"
+          :text="
+            searchQuery.length && !is_before_loading
+              ? 'Попробуйте ввести что-то другое'
+              : 'Введите что-нибудь в поле поиска'
+          "
+          :icon="searchQuery.length && !is_before_loading ? 'mdi-account-alert-outline' : 'mdi-account-search-outline'"
+        >
+        </v-empty-state>
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script setup lang="ts">
+import { usePageStore } from '~/store/page';
 import type { SearchType } from '~/types/search';
 
-definePageMeta({
-  title: 'Поиск',
-});
+usePageStore().page_name = 'Поиск';
 
 const select = ref<{ name: string; type: SearchType }>({ name: 'Все', type: 'ALL' });
 
@@ -74,7 +89,7 @@ const searchQuery = ref<string>('');
 
 const iconsByType: { [key in SearchType]: string } = {
   STUDENT: 'mdi-account',
-  STAFF: 'mdi-account',
+  STAFF: 'mdi-account-school-outline',
   EXTERNAL_STAFF: 'mdi-account',
   AUDITORIUM: 'mdi-door',
   GROUP: 'mdi-account-multiple',
@@ -98,18 +113,22 @@ const items = ref<{ name: string; type: SearchType }[]>([
   { name: 'Аудитория', type: 'AUDITORIUM' },
 ]);
 
-const loading = ref(false);
+const { is_page_loading } = storeToRefs(usePageStore());
+is_page_loading.value = false;
+const is_before_loading = ref(false);
 
 let timeout: NodeJS.Timeout;
 watch([searchQuery, select], ([query, selected]) => {
+  is_before_loading.value = true;
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
-    loading.value = true;
-    await window.electronAPI.getSearchResults(query, selected.type);
+    is_page_loading.value = true;
+    await window.ipcBridge.getSearchResults(query, selected.type);
   }, 700);
 });
 
 watch(searchResults, (searchResults) => {
-  loading.value = false;
+  is_page_loading.value = false;
+  is_before_loading.value = false;
 });
 </script>

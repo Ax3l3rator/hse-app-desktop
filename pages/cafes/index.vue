@@ -10,13 +10,14 @@
           item-title="name"
           item-value="id"
           v-model="selected_building"
+          rounded="lg"
         >
         </v-select>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <v-list v-if="cafes">
+        <v-list v-if="cafes" class="rounded-lg">
           <div v-for="(cafe, i) in cafes[selected_building][0].cafes">
             <v-list-item @click="goToCafePage(cafe)" class="py-3">
               <v-list-item-title>{{ cafe.cafe_name }}</v-list-item-title>
@@ -45,17 +46,16 @@
 </template>
 
 <script setup lang="ts">
+import { usePageStore } from '~/store/page';
 import type { BuildingCafe, Cafe, OpeningHour } from '~/types/cafes';
 
-definePageMeta({
-  title: 'Кафе и рестораны',
-});
+usePageStore().page_name = 'Кафе и столовые';
 
 const cafes = ref<Record<string, BuildingCafe[]>>();
 const buildings = ref<{ id: string; name: string }[]>();
 const selected_building = ref<string>('2311');
 
-window.electronAPI.getCafe().then((res) => {
+window.ipcBridge.getCafe().then((res) => {
   buildings.value = res.map(({ campus_id, campus_name }) => {
     return { id: campus_id, name: campus_name };
   });

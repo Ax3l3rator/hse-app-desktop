@@ -10,7 +10,7 @@
   "description": "Desktop app for HSE",
   "scripts": {
     "build": "nuxt build && electron-builder",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --trace-warnings",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -36,15 +36,15 @@
     "vite-plugin-electron-renderer": "^0.14.5",
     "vite-plugin-vuetify": "^2.0.1",
     "vue": "^3.4.11",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vuetify": "^3.7.19"
   },
   "main": "dist-electron/index.js",
   "dependencies": {
-    "@electron/notarize": "^3.0.0",
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "^0.10.1",
     "pinia": "^3.0.1",
-    "vuetify": "^3.4.11"
+    "yocto-spinner": "^0.2.1"
   },
   "build": {
     "appId": "hse.app.desktop",

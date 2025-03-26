@@ -28,7 +28,7 @@ import type { ServiceList, ServiceListItem } from '~/types/services';
 
 const service_list = ref<ServiceList>();
 
-window.electronAPI.getServiceList().then((res) => {
+window.ipcBridge.getServiceList().then((res) => {
   service_list.value = res;
 });
 
@@ -36,12 +36,12 @@ async function openService(service?: ServiceListItem) {
   if (service?.category) {
     await navigateTo({ path: '/services', query: { category: service.category } });
     // console.log(service.category);
-    // window.electronAPI.getServiceList(service.category).then((res) => {
+    // window.ipcBridge.getServiceList(service.category).then((res) => {
     //   console.log(res);
     //   service_list.value = res;
     // });
   } else if (service?.url) {
-    window.electronAPI.openInBrowser(service.url);
+    window.ipcBridge.openInBrowser(service.url);
   }
 }
 </script>
