@@ -11,8 +11,8 @@ dotenv.config({ path: resolve(__dirname, '../.env') });
 const config = dotenv.config({ path: resolve(__dirname, '../.env') }).parsed;
 
 if (!config?.CLIENT_ID || !config?.SECRET_KEY) {
-  throw new Error('Required environment variables are not set: ');
+  throw new Error('Required environment variables are not set');
 }
 
-export const CLIENT_ID = config?.CLIENT_ID || 'null';
-export const SECRET_KEY = config?.SECRET_KEY || 'null';
+export const CLIENT_ID = config.CLIENT_ID || 'null';
+export const SECRET_KEY = config.SECRET_KEY || 'null';
