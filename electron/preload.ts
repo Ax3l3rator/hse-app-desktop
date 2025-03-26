@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { SearchType } from '~/types/search';
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld('ipcBridge', {
   authorizeViaBrowser: async () => ipcRenderer.invoke('auth-hse-browser'),
   checkIfAuthorized: async () => await ipcRenderer.invoke('check-authorization'),
   leave: async () => await ipcRenderer.invoke('reset-tokens'),

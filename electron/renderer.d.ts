@@ -7,7 +7,7 @@ import type { ServiceList } from '~/types/services';
 
 type CafeResult<T> = T extends string ? Cafe : BuildingCafes;
 
-export interface IElectronAPI {
+export interface IipcBridge {
   authorizeViaBrowser: () => Promise<void>;
   checkIfAuthorized: () => Promise<boolean>;
   leave: () => Promise<void>;
@@ -34,7 +34,7 @@ export interface IElectronAPI {
 
 declare global {
   interface Window {
-    electronAPI: IElectronAPI;
+    ipcBridge: IipcBridge;
   }
 }
 declare module '#app' {

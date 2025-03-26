@@ -1,6 +1,6 @@
 import Store from 'electron-store';
 import { safeStorage } from 'electron';
-import { isAccessData, type AccessData, type RefreshData, type Token } from '../types';
+import { type AccessData, type Token } from '../types';
 import { SECRET_KEY } from '../config';
 
 export class Vault {
@@ -11,14 +11,12 @@ export class Vault {
     encryptionKey: SECRET_KEY,
   });
 
-  public static saveAccessData(data: AccessData | RefreshData) {
+  public static saveAccessData(data: AccessData) {
     const { access_token, expires_in } = data;
-    if (isAccessData(data)) {
-      const { refresh_token, refresh_expires_in } = data;
-      Vault.store.set('refresh_expires', refresh_expires_in);
-      Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
-      Vault.store.set('refresh_retrieved', new Date().getTime());
-    }
+    const { refresh_token, refresh_expires_in } = data;
+    Vault.store.set('refresh_expires', refresh_expires_in);
+    Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
+    Vault.store.set('refresh_retrieved', new Date().getTime());
 
     Vault.store.set('access_token', safeStorage.encryptString(access_token).toString('latin1'));
     Vault.store.set('access_expires', expires_in);

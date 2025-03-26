@@ -2,9 +2,7 @@ import type { Session } from 'electron';
 import { app, shell } from 'electron';
 import { URL } from 'node:url';
 
-type Permission = Parameters<
-  Exclude<Parameters<Session['setPermissionRequestHandler']>[0], null>
->[1];
+type Permission = Parameters<Exclude<Parameters<Session['setPermissionRequestHandler']>[0], null>>[1];
 
 const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
   import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL
@@ -12,10 +10,7 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
     : [],
 );
 
-const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>([
-  'https://hse.ru',
-  'https://github.com',
-]);
+const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>(['https://hse.ru', 'https://github.com']);
 
 app.on('web-contents-created', (_, contents) => {
   contents.on('will-navigate', (event, url) => {
@@ -30,21 +25,16 @@ app.on('web-contents-created', (_, contents) => {
     }
   });
 
-  contents.session.setPermissionRequestHandler(
-    (webContents, permission, callback) => {
-      const { origin } = new URL(webContents.getURL());
+  contents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    const { origin } = new URL(webContents.getURL());
 
-      const permissionGranted =
-        !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
-      callback(permissionGranted);
+    const permissionGranted = !!ALLOWED_ORIGINS_AND_PERMISSIONS.get(origin)?.has(permission);
+    callback(permissionGranted);
 
-      if (!permissionGranted && import.meta.env.DEV) {
-        console.warn(
-          `${origin} requested permission for '${permission}', but was rejected.`,
-        );
-      }
-    },
-  );
+    if (!permissionGranted && import.meta.env.DEV) {
+      console.warn(`${origin} requested permission for '${permission}', but was rejected.`);
+    }
+  });
   contents.setWindowOpenHandler(({ url }) => {
     const { origin } = new URL(url);
 
@@ -61,9 +51,7 @@ app.on('web-contents-created', (_, contents) => {
     const { origin } = new URL(params.src);
     if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       if (import.meta.env.DEV) {
-        console.warn(
-          `A webview tried to attach ${params.src}, but was blocked.`,
-        );
+        console.warn(`A webview tried to attach ${params.src}, but was blocked.`);
       }
 
       event.preventDefault();

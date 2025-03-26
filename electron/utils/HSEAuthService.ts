@@ -1,9 +1,8 @@
 import { net, shell } from 'electron';
-import { isAccessData, isRefreshData } from '../types';
+import { isAccessData } from '../types';
 import { CLIENT_ID } from '../config';
 import { Vault } from './Vault';
-import type { AccessData, RefreshData } from '../types';
-// import { InternalEventEmitter } from './InternalEventEmitter';
+import type { AccessData } from '../types';
 import { sendLeaveEvent } from '../mainWindow';
 
 export class HSEAuthService {
@@ -17,7 +16,7 @@ export class HSEAuthService {
     grant_type: 'authorization_code' | 'refresh_token',
     additional_data: { refresh_token: string } | { code: string },
   ) {
-    return new Promise<AccessData | RefreshData>((resolve, reject) => {
+    return new Promise<AccessData>((resolve, reject) => {
       const request = net.request({
         url: 'https://saml.hse.ru/realms/hse/protocol/openid-connect/token/',
         method: 'POST',
@@ -35,20 +34,19 @@ export class HSEAuthService {
           const responseData = JSON.parse(Buffer.concat(data).toString());
           if (isAccessData(responseData)) {
             resolve(responseData);
-          } else if (isRefreshData(responseData)) {
-            resolve(responseData);
           } else {
-            reject(new Error('Response data has wrong format'));
+            console.error(responseData);
+            reject('Wrong format in response');
           }
         });
         response.on('error', (error: Error) => {
-          console.error(error);
+          console.error('requestAccessDataResponse', error);
           reject(error);
         });
       });
 
       request.on('error', (error: Error) => {
-        console.error(error);
+        console.error('requestAccessData', error);
         reject(error);
       });
 
@@ -84,7 +82,7 @@ export class HSEAuthService {
     }
   }
 
-  public static isAuthorized() {
+  public static isAuthTokenValid() {
     try {
       Vault.getToken('access');
     } catch {
@@ -99,13 +97,13 @@ export class HSEAuthService {
   }
 
   private static getURLEncodedParams(
-    grant_type: 'access_token' | 'refresh_token' | 'authorization_code',
+    grant_type: 'refresh_token' | 'authorization_code',
     additional_data: { refresh_token: string } | { code: string },
   ) {
     const params = {
-      client_id: CLIENT_ID,
       redirect_uri: 'ruz-app-fiddle://auth.hse.ru/adfs/oauth2/callback',
       grant_type,
+      client_id: CLIENT_ID,
       ...additional_data,
     };
     const urlEncodedParams = new URLSearchParams(params).toString();
@@ -113,7 +111,16 @@ export class HSEAuthService {
   }
 
   private static getStdAuthURL() {
-    return `https://saml.hse.ru/realms/hse/protocol/openid-connect/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=ruz-app-fiddle://auth.hse.ru/adfs/oauth2/callback`;
+    const url = new URL('https://saml.hse.ru/realms/hse/protocol/openid-connect/auth');
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: CLIENT_ID,
+      redirect_uri: 'ruz-app-fiddle://auth.hse.ru/adfs/oauth2/callback',
+      scope: 'profile email',
+    });
+    url.search = params.toString();
+
+    return url.toString();
   }
 
   public static openAuthBrowserExternal() {
@@ -122,9 +129,10 @@ export class HSEAuthService {
 
   public static async authorize() {
     return new Promise<boolean>((resolve, reject) => {
-      if (HSEAuthService.isAuthorized()) {
+      if (HSEAuthService.isAuthTokenValid()) {
         resolve(true);
       } else {
+        console.log('Trying to refresh access data...');
         HSEAuthService.refreshAccessData()
           .then(() => resolve(true))
           .catch((_) => {
@@ -140,7 +148,6 @@ export class HSEAuthService {
         url: 'https://api.hseapp.ru/v3/dump/me',
         method: 'GET',
       });
-      console.log(Vault.getToken('access'));
       const accessToken = Vault.getToken('access');
       request.setHeader('Authorization', `Bearer ${accessToken.token}`);
       request.setHeader('Accept-Language', 'ru');
@@ -159,7 +166,7 @@ export class HSEAuthService {
       });
 
       request.on('error', (error: Error) => {
-        console.error(error);
+        console.error('getFullUserInfo', error);
         reject(error);
       });
 
@@ -191,7 +198,7 @@ export class HSEAuthService {
       });
 
       request.on('error', (error: Error) => {
-        console.error(error);
+        console.error('getSchedule', error);
         reject(error);
       });
 

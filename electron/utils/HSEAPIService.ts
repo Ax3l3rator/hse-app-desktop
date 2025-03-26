@@ -178,7 +178,7 @@ export class HSEAPIService {
       if (academic_year) {
         url.searchParams.append('academic_year', academic_year);
       }
-      console.log(url.toString());
+
       const request = net.request({
         url: url.toString(),
         method: 'GET',

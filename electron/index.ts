@@ -1,12 +1,11 @@
 // import './security';
-import { app, ipcMain, shell } from 'electron';
+import { app } from 'electron';
 import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
+import './ipcHandlers';
+import './security';
 import { platform } from 'node:process';
 import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
-import { InternalEventEmitter } from './utils/InternalEventEmitter';
-import { HSEAPIService } from './utils/HSEAPIService';
-import type { SearchType } from '~/types/search';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -50,45 +49,7 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(() => {
-    ipcMain.handle('auth-hse-browser', () => HSEAuthService.openAuthBrowserExternal());
-    InternalEventEmitter.getAuthEventHook(HSEAuthService.openAuthBrowserExternal);
-    ipcMain.handle('check-authorization', async () => {
-      try {
-        const res = await HSEAuthService.authorize();
-        return res;
-      } catch (err) {
-        return false;
-      }
-    });
-    ipcMain.handle('get-full-user-info', async () => await HSEAuthService.getFullUserInfo());
-    ipcMain.handle('reset-tokens', HSEAuthService.leave);
-    ipcMain.handle('get-student-schedule', async (_, email) => await HSEAuthService.getSchedule(email));
-    ipcMain.handle('get-search-results', (event, query: string, type: SearchType) =>
-      HSEAPIService.requestSearchResults(query, type).then((res) => {
-        event.sender.send('search-results-arrived', res);
-      }),
-    );
-    ipcMain.handle('get-name-by-email', async (_, email) => await HSEAPIService.getNameByEmail(email));
-    ipcMain.handle('get-full-person-info', async (_, email) => await HSEAPIService.getFullPersonInfo(email));
-    ipcMain.handle('get-buildings', async () => await HSEAPIService.getBuildings());
-    ipcMain.handle(
-      'get-grades',
-      async (_, program_id, academic_year) => await HSEAPIService.getGrades(program_id, academic_year),
-    );
-    ipcMain.handle('get-personal-rating', async () => await HSEAPIService.getPersonalRating());
-    ipcMain.handle('get-rating-list', async () => await HSEAPIService.getRatingList());
-    ipcMain.handle('get-rating', async (_, target, id) => await HSEAPIService.getRating(target, id));
-    ipcMain.handle('get-service-list', async (_, category) => await HSEAPIService.getServiceList(category));
-    ipcMain.handle('get-cafe', async (_, id) => await HSEAPIService.getCafe(id));
-    ipcMain.handle('get-cafe-menu', async (_, id) => await HSEAPIService.getCafeMenu(id));
-    ipcMain.handle('get-free-auditoriums', (event, building_id, date_from, date_to) =>
-      HSEAPIService.getFreeAuditoriums(building_id, date_from, date_to).then((res) => {
-        event.sender.send('free-auditoriums-arrived', res);
-      }),
-    );
-    ipcMain.handle('open-in-browser', (_, url) => {
-      shell.openExternal(url);
-    });
+    // handlers
     restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));
