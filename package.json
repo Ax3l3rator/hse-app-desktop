@@ -1,6 +1,6 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "private": true,
   "author": {
     "name": "Alex Koledaev",
@@ -9,7 +9,7 @@
   },
   "description": "Desktop app for HSE",
   "scripts": {
-    "build": "nuxt build && electron-builder",
+    "build": "nuxt generate && electron-builder",
     "dev": "nuxt dev --trace-warnings",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
@@ -78,8 +78,7 @@
     },
     "files": [
       ".output/**/*",
-      "dist-electron",
-      ".env"
+      "dist-electron"
     ]
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"

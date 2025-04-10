@@ -1,18 +1,8 @@
-import * as dotenv from 'dotenv';
-import { existsSync } from 'fs';
-import { resolve } from 'path';
+import { CLIENT_ID_R, SECRET_KEY_R } from './.env';
 
-if (!existsSync(resolve(__dirname, '../.env'))) {
-  throw 'Environment configuration file is absent';
-}
-
-dotenv.config({ path: resolve(__dirname, '../.env') });
-
-const config = dotenv.config({ path: resolve(__dirname, '../.env') }).parsed;
-
-if (!config?.CLIENT_ID || !config?.SECRET_KEY) {
+if (!CLIENT_ID_R || !SECRET_KEY_R) {
   throw new Error('Required environment variables are not set');
 }
 
-export const CLIENT_ID = config.CLIENT_ID || 'null';
-export const SECRET_KEY = config.SECRET_KEY || 'null';
+export const CLIENT_ID = CLIENT_ID_R;
+export const SECRET_KEY = SECRET_KEY_R;

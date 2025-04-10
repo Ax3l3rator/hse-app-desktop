@@ -95,9 +95,13 @@
       </v-row>
     </v-container>
   </div>
-  <div v-else>
-    <nothing-found name="расписании"></nothing-found>
+  <div v-else-if="schedule && Object.keys(schedule).length === 0">
+    <v-empty-state :title="'Занятий сейчас нет('" :icon="'mdi-calendar-remove-outline'"> </v-empty-state>
   </div>
+  <div v-else>
+    <v-empty-state :title="'Информации о занятиях не нашлось('" :icon="'mdi-calendar-alert-outline'"> </v-empty-state>
+  </div>
+  <div></div>
 </template>
 
 <script setup lang="ts">

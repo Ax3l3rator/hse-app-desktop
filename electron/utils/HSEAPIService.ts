@@ -427,4 +427,36 @@ export class HSEAPIService {
       request.end();
     });
   }
+
+  public static getSchedule(email: string) {
+    return new Promise<any>((resolve, reject) => {
+      const request = net.request({
+        url: `https://api.hseapp.ru/v3/ruz/lessons?email=${encodeURIComponent(email)}`,
+        method: 'GET',
+      });
+      const accessToken = Vault.getToken('access');
+      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
+      request.setHeader('Accept-Language', 'ru-FI;q=1.0 en-GB;q=0.9');
+      request.on('response', (response) => {
+        const data: Buffer[] = [];
+        response.on('data', (chunk) => {
+          data.push(chunk);
+        });
+        response.on('end', () => {
+          const responseData = JSON.parse(Buffer.concat(data).toString());
+          resolve(responseData);
+        });
+        response.on('error', (err: Error) => {
+          console.error(err);
+        });
+      });
+
+      request.on('error', (error: Error) => {
+        console.error('getSchedule', error);
+        reject(error);
+      });
+
+      request.end();
+    });
+  }
 }

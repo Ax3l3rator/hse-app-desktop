@@ -23,4 +23,7 @@ function authorize() {
 window.ipcBridge.onAuthorize(async () => {
   await navigateTo('/');
 });
+definePageMeta({
+  layout: 'unauthorized',
+});
 </script>

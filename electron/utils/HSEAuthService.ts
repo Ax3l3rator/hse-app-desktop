@@ -67,7 +67,11 @@ export class HSEAuthService {
   }
 
   public static async refreshAccessData() {
-    if (!HSEAuthService.isExpiredToken('refresh')) {
+    return new Promise((resolve, reject) => {
+      if (!HSEAuthService.isTokenValid('refresh')) {
+        throw 'refresh is not valid';
+      }
+
       HSEAuthService.requestAccessData('refresh_token', {
         refresh_token: Vault.getToken('refresh').token,
       })
@@ -75,25 +79,46 @@ export class HSEAuthService {
           Vault.saveAccessData(accessData);
         })
         .catch((error) => {
-          throw error;
+          console.error('Something went wrong during refreshing auth data:', error);
+          reject(error);
         });
-    } else {
-      throw 'Need to request new refresh token';
-    }
+    });
   }
 
-  public static isAuthTokenValid() {
+  public static isTokenValid(token_type: 'access' | 'refresh') {
     try {
-      Vault.getToken('access');
+      Vault.getToken(token_type);
     } catch {
+      console.log(`${token_type} token is not set`);
       return false;
     }
-    return !HSEAuthService.isExpiredToken('access');
+
+    if (HSEAuthService.isExpiredToken(token_type)) {
+      console.log(`${token_type} token is expired`);
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public static isExpiredToken(tokenType: 'access' | 'refresh'): boolean {
     const token = Vault.getToken(tokenType);
     return token.retrieved_at.getTime() + token.expires_in * 1000 < new Date().getTime();
+  }
+
+  public static async authorize() {
+    return new Promise<boolean>((resolve, reject) => {
+      if (HSEAuthService.isTokenValid('access')) {
+        resolve(true);
+      } else {
+        console.log('Trying to refresh access data...');
+        HSEAuthService.refreshAccessData()
+          .then(() => resolve(true))
+          .catch((_) => {
+            reject(false);
+          });
+      }
+    });
   }
 
   private static getURLEncodedParams(
@@ -127,21 +152,6 @@ export class HSEAuthService {
     shell.openExternal(HSEAuthService.getStdAuthURL());
   }
 
-  public static async authorize() {
-    return new Promise<boolean>((resolve, reject) => {
-      if (HSEAuthService.isAuthTokenValid()) {
-        resolve(true);
-      } else {
-        console.log('Trying to refresh access data...');
-        HSEAuthService.refreshAccessData()
-          .then(() => resolve(true))
-          .catch((_) => {
-            reject(false);
-          });
-      }
-    });
-  }
-
   public static async getFullUserInfo() {
     return new Promise<any>((resolve, reject) => {
       const request = net.request({
@@ -167,38 +177,6 @@ export class HSEAuthService {
 
       request.on('error', (error: Error) => {
         console.error('getFullUserInfo', error);
-        reject(error);
-      });
-
-      request.end();
-    });
-  }
-
-  public static getSchedule(email: string) {
-    return new Promise<any>((resolve, reject) => {
-      const request = net.request({
-        url: `https://api.hseapp.ru/v3/ruz/lessons?email=${encodeURIComponent(email)}`,
-        method: 'GET',
-      });
-      const accessToken = Vault.getToken('access');
-      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
-      request.setHeader('Accept-Language', 'ru-FI;q=1.0 en-GB;q=0.9');
-      request.on('response', (response) => {
-        const data: Buffer[] = [];
-        response.on('data', (chunk) => {
-          data.push(chunk);
-        });
-        response.on('end', () => {
-          const responseData = JSON.parse(Buffer.concat(data).toString());
-          resolve(responseData);
-        });
-        response.on('error', (err: Error) => {
-          console.error(err);
-        });
-      });
-
-      request.on('error', (error: Error) => {
-        console.error('getSchedule', error);
         reject(error);
       });
 
