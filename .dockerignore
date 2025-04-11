@@ -1,0 +1,12 @@
+dist*
+docs
+mocks
+node_modules
+.vscode
+.output
+.nuxt
+.git
+.env
+openid.json
+Dockerfile
+docker-compose.yml

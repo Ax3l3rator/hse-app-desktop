@@ -7,9 +7,11 @@
     "email": "work.ax3l3rator@gmail.com",
     "url": "https://github.com/Ax3l3rator"
   },
+  "homepage": "https://github.com/Ax3l3rator/hse-app-desktop",
   "description": "Desktop app for HSE",
   "scripts": {
-    "build": "nuxt generate && electron-builder",
+    "build": "docker compose up",
+    "build:docker": "nuxt generate && electron-builder -wl",
     "dev": "nuxt dev --trace-warnings",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
@@ -25,7 +27,7 @@
     "@vueuse/nuxt": "^13.0.0",
     "dotenv": "^16.3.1",
     "electron": "^35.0.1",
-    "electron-builder": "^25.1.8",
+    "electron-builder": "^26.0.12",
     "electron-store": "^10.0.1",
     "jsonwebtoken": "^9.0.2",
     "nuxt": "^3.9.1",
@@ -47,14 +49,22 @@
     "yocto-spinner": "^0.2.1"
   },
   "build": {
-    "appId": "hse.app.desktop",
+    "appId": "ru.hse.desktopApplication",
     "asar": true,
+    "protocols": [
+      {
+        "name": "default",
+        "schemes": [
+          "ruz-app-fiddle"
+        ]
+      }
+    ],
     "productName": "HSE App Desktop",
     "directories": {
-      "output": "release/${version}"
+      "output": "release/${version}/${os}"
     },
     "mac": {
-      "artifactName": "${productName}_${version}.${ext}",
+      "artifactName": "${name}-${version}-${os}.${ext}",
       "target": [
         "dmg"
       ]
@@ -66,19 +76,38 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
         }
       ],
-      "artifactName": "${productName}_${version}_setup.${ext}"
+      "artifactName": "${name}-${version}-${os}.${ext}"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": false
+      "deleteAppDataOnUninstall": true,
+      "differentialPackage": false
+    },
+    "linux": {
+      "mimeTypes": [
+        "x-scheme-handler/ruz-app-fiddle"
+      ],
+      "target": [
+        "AppImage",
+        "deb",
+        "pacman",
+        "tar.gz"
+      ],
+      "artifactName": "${name}-${version}-${os}.${ext}"
     },
     "files": [
-      ".output/**/*",
-      "dist-electron"
+      "./.output/**/*",
+      "./dist-electron/**/*"
     ]
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
