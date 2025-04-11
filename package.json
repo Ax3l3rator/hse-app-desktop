@@ -1,6 +1,6 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": true,
   "author": {
     "name": "Alex Koledaev",
@@ -12,6 +12,7 @@
   "scripts": {
     "build": "docker compose up",
     "build:docker": "nuxt generate && electron-builder -wl",
+    "build:linux": "nuxt generate && electron-builder -l",
     "dev": "nuxt dev --trace-warnings",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
@@ -53,7 +54,7 @@
     "asar": true,
     "protocols": [
       {
-        "name": "default",
+        "name": "ruz-app-protocol",
         "schemes": [
           "ruz-app-fiddle"
         ]
@@ -97,6 +98,13 @@
       "mimeTypes": [
         "x-scheme-handler/ruz-app-fiddle"
       ],
+      "desktop": {
+        "entry": {
+          "Name": "Hse App",
+          "MimeType": "ruz-app-fiddle"
+        }
+      },
+      "category": "Application",
       "target": [
         "AppImage",
         "deb",

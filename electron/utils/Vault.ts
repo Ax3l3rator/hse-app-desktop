@@ -3,6 +3,11 @@ import { safeStorage } from 'electron';
 import { type AccessData, type Token } from '../types';
 import { SECRET_KEY } from '../config';
 
+if (!safeStorage.isEncryptionAvailable()) {
+  console.warn('using plain text encryption');
+  safeStorage.setUsePlainTextEncryption(true);
+}
+
 export class Vault {
   protected static store = new Store({
     name: 'auth-store',
