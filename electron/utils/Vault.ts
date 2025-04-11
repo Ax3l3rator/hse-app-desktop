@@ -1,30 +1,44 @@
 import Store from 'electron-store';
-import { safeStorage } from 'electron';
+import { app, safeStorage } from 'electron';
 import { isAccessData, type AccessData, type RefreshData, type Token } from '../types';
 import { SECRET_KEY } from '../config';
 
 export class Vault {
   protected static store = new Store({
-    encryptionKey: SECRET_KEY,
-    name: 'auth-store',
-    watch: true,
+    // encryptionKey: SECRET_KEY,
+    name: 'mystore',
+    // watch: true,
   });
-
   public static saveAccessData(data: AccessData | RefreshData) {
+
+    // console.log(app.getPath('userData'));
+    // console.log(safeStorage.getSelectedStorageBackend());
+    // console.log(safeStorage.isEncryptionAvailable());
+    if(!safeStorage.isEncryptionAvailable()){
+      console.warn('System keychain encription is not available, using another cryptography method');
+      safeStorage.setUsePlainTextEncryption(true);
+    }
     const { access_token, expires_in } = data;
+    // console.log(access_token);
+    // console.log(safeStorage.encryptString(access_token).toString('base64'));
     if (isAccessData(data)) {
       const { refresh_token, refresh_expires_in } = data;
       Vault.store.set('refresh_expires', refresh_expires_in);
-      Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('latin1'));
+      Vault.store.set('refresh_token', safeStorage.encryptString(refresh_token).toString('base64'));
       Vault.store.set('refresh_retrieved', new Date().getTime());
     }
 
-    Vault.store.set('access_token', safeStorage.encryptString(access_token).toString('latin1'));
+    Vault.store.set('access_token', safeStorage.encryptString(access_token).toString('base64'));
     Vault.store.set('access_expires', expires_in);
     Vault.store.set('access_retrieved', new Date().getTime());
   }
 
   public static getToken(tokenType: 'access' | 'refresh'): Token {
+    if(!safeStorage.isEncryptionAvailable()){
+      console.warn('System keychain encription is not available, using another cryptography method');
+      safeStorage.setUsePlainTextEncryption(true);
+    }
+    
     const token = Vault.store.get(`${tokenType}_token`) as string;
     if (!token) {
       throw new Error(`token is not set for ${tokenType}`);
@@ -40,7 +54,7 @@ export class Vault {
       throw new Error(`retrieved_at is not set for ${tokenType}`);
     }
 
-    const decrypted_token = safeStorage.decryptString(Buffer.from(token, 'latin1'));
+    const decrypted_token = safeStorage.decryptString(Buffer.from(token, 'base64'));
 
     return { token: decrypted_token, expires_in, retrieved_at };
   }

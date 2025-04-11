@@ -33,6 +33,7 @@ export class HSEAuthService {
 
         response.on('end', () => {
           const responseData = JSON.parse(Buffer.concat(data).toString());
+          console.log(responseData);
           if (isAccessData(responseData)) {
             resolve(responseData);
           } else if (isRefreshData(responseData)) {
@@ -60,7 +61,9 @@ export class HSEAuthService {
 
   public static async authorizeByRedirectUrl(redirectUrl: string) {
     const code = HSEAuthService.getCodeFromUrl(redirectUrl);
+    console.log(code);
     const accessData = await HSEAuthService.requestAccessData('authorization_code', { code });
+  
     try {
       Vault.saveAccessData(accessData);
     } catch (err) {
@@ -87,7 +90,7 @@ export class HSEAuthService {
   public static isAuthorized() {
     try {
       Vault.getToken('access');
-    } catch {
+    } catch(err) {
       return false;
     }
     return !HSEAuthService.isExpiredToken('access');
