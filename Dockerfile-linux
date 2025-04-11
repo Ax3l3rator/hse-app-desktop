@@ -9,4 +9,4 @@ COPY . .
 
 RUN yarn
 
-CMD [ "yarn", "build:linux" ]
+CMD [ "yarn", "build:docker" ]

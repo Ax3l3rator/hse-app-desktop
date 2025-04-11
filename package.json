@@ -1,6 +1,6 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "author": {
     "name": "Alex Koledaev",
@@ -111,7 +111,13 @@
         "pacman",
         "tar.gz"
       ],
-      "artifactName": "${name}-${version}-${os}.${ext}"
+      "artifactName": "${name}-${version}-${os}.${ext}",
+      "extraFiles": [
+        {
+          "from": "./build/install.sh",
+          "to": "install.sh"
+        }
+      ]
     },
     "files": [
       "./.output/**/*",
