@@ -16,3 +16,5 @@ EOL
 desktop-file-install --dir=$HOME/.local/share/applications ./hse-app.desktop
 
 update-desktop-database ~/.local/share/applications
+
+rm ./hse-app.desktop
