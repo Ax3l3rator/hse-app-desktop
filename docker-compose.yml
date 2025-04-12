@@ -1,7 +1,9 @@
 version: '3.6'
 services:
-  electron-builder-linux:
+  electron-builder:
     build:
-      dockerfile: 'Dockerfile-linux'
+      dockerfile: 'Dockerfile'
+      target: electron-builder
+    # tty: true
     volumes:
       - ./release:/build_dir/release

@@ -17,6 +17,7 @@ async function createWindow() {
     width: 1280,
     height: 720,
     title: 'HSE App Desktop',
+    icon: join(app.getAppPath(), './icon.png'),
   });
 
   browserWindow.on('ready-to-show', () => {

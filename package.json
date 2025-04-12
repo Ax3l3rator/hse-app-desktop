@@ -11,11 +11,11 @@
   "description": "Desktop app for HSE",
   "scripts": {
     "build": "docker compose up --build",
-    "build:docker": "nuxt generate && electron-builder -wl",
-    "build:linux": "nuxt generate && electron-builder -l",
-    "build:windows": "nuxt generate && electron-builder -w",
+    "build:docker": "electron-builder -wl",
+    "build:linux": "electron-builder -l",
+    "build:windows": "electron-builder -w",
     "dev": "nuxt dev --trace-warnings",
-    "generate": "nuxt generate && electron-builder",
+    "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "nuxt generate",
@@ -47,8 +47,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@pinia/nuxt": "^0.10.1",
-    "pinia": "^3.0.1",
-    "yocto-spinner": "^0.2.1"
+    "pinia": "^3.0.1"
   },
   "build": {
     "appId": "ru.hse.desktopApplication",
@@ -106,22 +105,20 @@
       ],
       "category": "Application",
       "target": [
-        "AppImage",
-        "deb",
-        "pacman",
         "tar.gz"
       ],
-      "artifactName": "${name}-${version}-${os}.${ext}",
-      "extraFiles": [
-        {
-          "from": "./build/install.sh",
-          "to": "install.sh"
-        }
-      ]
+      "artifactName": "${name}-${version}-${os}.${ext}"
     },
     "files": [
       "./.output/**/*",
-      "./dist-electron/**/*"
+      "./dist-electron/**/*",
+      {
+        "from": "./build/",
+        "to": ".",
+        "filter": [
+          "icon.png"
+        ]
+      }
     ]
   },
   "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"

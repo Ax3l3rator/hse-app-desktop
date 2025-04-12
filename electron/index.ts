@@ -6,12 +6,43 @@ import './security';
 import { platform } from 'node:process';
 import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { spawn } from 'node:child_process';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
 if (!isSingleInstance) {
   app.quit();
   process.exit(0);
+}
+
+console.log(join(app.getAppPath(), './icon.png'));
+
+if (platform === 'linux') {
+  const home_folder = app.getPath('home');
+  const exe_path = app.getPath('exe');
+
+  const desktop_file_path = join(home_folder, '.local', 'share', 'applications', 'hse-app.desktop');
+
+  if (spawn('which', ['hse-app-desktop']).stdout.read() === '') {
+    if (!existsSync(desktop_file_path)) {
+      writeFileSync(
+        desktop_file_path,
+        `[Desktop Entry]\nType=Application\nName=hse-app-desktop\nMimeType=x-scheme-handler/ruz-app-fiddle\nExec=${exe_path} %u\n`,
+      );
+      spawn(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+    } else {
+      const desktop_file_contents = readFileSync(desktop_file_path);
+      const lines = desktop_file_contents.toString().split('\n');
+      const actual_exec_line = `Exec=${exe_path} %u`;
+      if (lines[lines.length - 1] !== actual_exec_line) {
+        lines[lines.length - 1] = actual_exec_line;
+        writeFileSync(desktop_file_path, lines.join('\n'));
+        spawn(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+      }
+    }
+  }
 }
 
 app.on('second-instance', restoreOrCreateWindow);
