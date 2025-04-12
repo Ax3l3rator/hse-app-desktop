@@ -83,10 +83,12 @@
       </template>
     </v-navigation-drawer>
 
-    <v-app-bar density="comfortable" scroll-behavior="elevate" scroll-target="main">
+    <v-app-bar density="comfortable">
       <template #prepend>
-        <v-btn size="small" @click="router.back()" icon="mdi-arrow-left-circle"></v-btn>
+        <v-btn class="mx-1" density="comfortable" @click="router.back()" icon="mdi-arrow-left-circle"></v-btn>
+        <v-divider vertical inset></v-divider>
       </template>
+
       <v-app-bar-title>
         {{ page_name }}
       </v-app-bar-title>
@@ -108,7 +110,7 @@
       </template>
     </v-app-bar>
     <v-main>
-      <div class="pr-5 pl-7">
+      <div class="pr-5 pl-7" style="height: 100%; overflow-y: auto">
         <slot />
       </div>
     </v-main>

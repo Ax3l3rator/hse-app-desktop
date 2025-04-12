@@ -62,7 +62,7 @@
           <div v-for="(rating_item, index, j) in ratings_grouped">
             <v-list-item>
               <template #prepend> </template>
-              <v-list-item v-for="(rating, i) in rating_item" class="pa-0">
+              <v-list-item :to="`/students/${rating.profile.email}`" v-for="(rating, i) in rating_item" rounded="lg">
                 <v-list-item-title> {{ rating.profile.full_name }} </v-list-item-title>
                 <template #prepend>
                   <div
