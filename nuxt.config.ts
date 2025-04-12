@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  ssr: true,
+  ssr: false,
 
   experimental: {
     appManifest: false, // set this to false, then the application starts working
