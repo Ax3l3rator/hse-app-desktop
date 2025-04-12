@@ -28,4 +28,4 @@ COPY --from=tsbuilder /app/node_modules ./node_modules
 
 COPY ./package.json ./
 
-CMD [ "yarn", "build:linux" ]
+CMD [ "yarn", "build:docker" ]
