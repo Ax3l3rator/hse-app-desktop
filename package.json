@@ -1,6 +1,6 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "author": {
     "name": "Alex Koledaev",
@@ -10,9 +10,10 @@
   "homepage": "https://github.com/Ax3l3rator/hse-app-desktop",
   "description": "Desktop app for HSE",
   "scripts": {
-    "build": "docker compose up",
+    "build": "docker compose up --build",
     "build:docker": "nuxt generate && electron-builder -wl",
     "build:linux": "nuxt generate && electron-builder -l",
+    "build:windows": "nuxt generate && electron-builder -w",
     "dev": "nuxt dev --trace-warnings",
     "generate": "nuxt generate && electron-builder",
     "preview": "nuxt preview",
@@ -64,6 +65,11 @@
     "directories": {
       "output": "release/${version}/${os}"
     },
+    "electronLanguages": [
+      "ru",
+      "en-US",
+      "en-GB"
+    ],
     "mac": {
       "artifactName": "${name}-${version}-${os}.${ext}",
       "target": [
@@ -98,12 +104,6 @@
       "mimeTypes": [
         "x-scheme-handler/ruz-app-fiddle"
       ],
-      "desktop": {
-        "entry": {
-          "Name": "Hse App",
-          "MimeType": "ruz-app-fiddle"
-        }
-      },
       "category": "Application",
       "target": [
         "AppImage",

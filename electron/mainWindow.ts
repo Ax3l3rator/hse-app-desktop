@@ -16,7 +16,6 @@ async function createWindow() {
     minWidth: 800,
     width: 1280,
     height: 720,
-    icon: '../icons/icon.png',
     title: 'HSE App Desktop',
   });
 

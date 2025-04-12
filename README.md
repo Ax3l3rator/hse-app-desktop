@@ -27,6 +27,8 @@ gh release upload <your.version.here> '.\release\<your.version.here>\<file here>
 ```powershell
 $version = node -p 'require("./package.json").version'
 
+gh release create $version
+
 Get-ChildItem -Path .\release\$version\win -File | ForEach-Object {
     gh release upload $version $_.FullName --clobber
 }
