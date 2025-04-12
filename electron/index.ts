@@ -17,15 +17,13 @@ if (!isSingleInstance) {
   process.exit(0);
 }
 
-console.log(join(app.getAppPath(), './icon.png'));
-
 if (platform === 'linux') {
   const home_folder = app.getPath('home');
   const exe_path = app.getPath('exe');
 
   const desktop_file_path = join(home_folder, '.local', 'share', 'applications', 'hse-app.desktop');
 
-  if (spawn('which', ['hse-app-desktop']).stdout.read() === '') {
+  if (spawn('whereis', ['hse-app-desktop']).stdout.read() === 'hse-aapp-desktop:') {
     if (!existsSync(desktop_file_path)) {
       writeFileSync(
         desktop_file_path,
