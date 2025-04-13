@@ -8,7 +8,7 @@ import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -23,13 +23,13 @@ if (platform === 'linux') {
 
   const desktop_file_path = join(home_folder, '.local', 'share', 'applications', 'hse-app.desktop');
 
-  if (spawn('whereis', ['hse-app-desktop']).stdout.read() === 'hse-app-desktop:') {
+  if (spawnSync('which', ['hse-app-desktop']).status === 1) {
     if (!existsSync(desktop_file_path)) {
       writeFileSync(
         desktop_file_path,
         `[Desktop Entry]\nType=Application\nName=hse-app-desktop\nMimeType=x-scheme-handler/ruz-app-fiddle\nExec=${exe_path} %u\n`,
       );
-      spawn(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+      spawnSync(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
     } else {
       const desktop_file_contents = readFileSync(desktop_file_path);
       const lines = desktop_file_contents.toString().split('\n');
@@ -37,7 +37,7 @@ if (platform === 'linux') {
       if (lines[lines.length - 1] !== actual_exec_line) {
         lines[lines.length - 1] = actual_exec_line;
         writeFileSync(desktop_file_path, lines.join('\n'));
-        spawn(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+        spawnSync(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
       }
     }
   }
