@@ -23,7 +23,7 @@ if (platform === 'linux') {
 
   const desktop_file_path = join(home_folder, '.local', 'share', 'applications', 'hse-app.desktop');
 
-  if (spawn('whereis', ['hse-app-desktop']).stdout.read() === 'hse-aapp-desktop:') {
+  if (spawn('whereis', ['hse-app-desktop']).stdout.read() === 'hse-app-desktop:') {
     if (!existsSync(desktop_file_path)) {
       writeFileSync(
         desktop_file_path,
