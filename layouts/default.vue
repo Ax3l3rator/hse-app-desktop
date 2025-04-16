@@ -90,7 +90,7 @@
         <v-divider class="ml-1" vertical inset></v-divider>
       </template>
 
-      <v-app-bar-title> {{ page_name }} | {{ userData?.type }} </v-app-bar-title>
+      <v-app-bar-title> {{ page_name }} </v-app-bar-title>
       <v-progress-linear absolute location="bottom" :active="is_page_loading" indeterminate color="primary">
       </v-progress-linear>
       <v-spacer></v-spacer>
