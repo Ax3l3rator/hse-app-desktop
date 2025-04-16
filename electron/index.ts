@@ -1,7 +1,6 @@
 // import './security';
 import { app } from 'electron';
 import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
-import './ipcHandlers';
 import './security';
 import { platform } from 'node:process';
 import { resolve } from 'path';
@@ -9,9 +8,11 @@ import { HSEAuthService } from './utils/HSEAuthService';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { initHandlers } from './ipcHandlers';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
+
 if (!isSingleInstance) {
   app.quit();
   process.exit(0);
@@ -79,6 +80,7 @@ app
   .whenReady()
   .then(() => {
     // handlers
+    initHandlers();
     restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

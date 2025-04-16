@@ -47,16 +47,17 @@
           </template>
           <v-skeleton-loader width="167" height="12" class="ma-4 rounded-xl"></v-skeleton-loader>
         </v-list-item>
-        <v-list-item
-          rounded="lg"
-          v-for="element of menuElements"
-          v-else
-          :key="element.value"
-          :to="element.to"
-          :prepend-icon="element.icon"
-          :title="element.title"
-        >
-        </v-list-item>
+        <div v-else v-for="element of menuElements">
+          <v-list-item
+            rounded="lg"
+            v-if="element.type === 'any' || element.type === userData?.type"
+            :key="element.value"
+            :to="element.to"
+            :prepend-icon="element.icon"
+            :title="element.title"
+          >
+          </v-list-item>
+        </div>
       </v-list>
       <template v-slot:append>
         <v-list density="compact" nav>
@@ -86,12 +87,10 @@
     <v-app-bar density="comfortable">
       <template #prepend>
         <v-btn class="mx-1" density="comfortable" @click="router.back()" icon="mdi-arrow-left-circle"></v-btn>
-        <v-divider vertical inset></v-divider>
+        <v-divider class="ml-1" vertical inset></v-divider>
       </template>
 
-      <v-app-bar-title>
-        {{ page_name }}
-      </v-app-bar-title>
+      <v-app-bar-title> {{ page_name }} | {{ userData?.type }} </v-app-bar-title>
       <v-progress-linear absolute location="bottom" :active="is_page_loading" indeterminate color="primary">
       </v-progress-linear>
       <v-spacer></v-spacer>
@@ -143,42 +142,49 @@ const menuElements = ref([
     title: 'Расписание',
     value: 'timetable',
     to: '/',
+    type: 'any',
   },
   {
     icon: 'mdi-magnify',
     title: 'Поиск',
     value: 'search',
     to: '/search',
+    type: 'any',
   },
   {
     icon: 'mdi-door-open',
     title: 'Свободные аудитории',
     value: 'user-settings',
     to: '/free',
+    type: 'any',
   },
   {
     icon: 'mdi-book-open-variant-outline',
     title: 'Зачетная книжка',
     value: 'grade-book',
     to: '/grades',
+    type: 'STUDENT',
   },
   {
     icon: 'mdi-chart-line',
     title: 'Рейтинг',
     value: 'rating',
     to: '/rating',
+    type: 'STUDENT',
   },
   {
     icon: 'mdi-compass-outline',
     title: 'Сервисы',
     value: 'services',
     to: '/services',
+    type: 'any',
   },
   {
     icon: 'mdi-silverware-variant',
     title: 'Кафе и столовые',
     value: 'cafes',
     to: '/cafes',
+    type: 'any',
   },
 ]);
 
@@ -189,6 +195,7 @@ onMounted(() => {
       title: 'Тестовая страница',
       value: 'testing-page',
       to: '/testing',
+      type: 'any',
     });
   }
 });
@@ -203,6 +210,7 @@ const userData = ref<
       };
       email: string;
       avatar_url: string;
+      type: string;
     }
   | undefined
 >();

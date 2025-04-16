@@ -1,6 +1,6 @@
 {
   "name": "hse-app-desktop",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "private": true,
   "author": {
     "name": "Alex Koledaev",
@@ -14,8 +14,8 @@
     "build:docker": "electron-builder -wl",
     "build:linux": "electron-builder -l",
     "build:windows": "electron-builder -w",
-    "dev": "nuxt dev --trace-warnings",
-    "generate": "nuxt generate",
+    "dev": "nuxt dev --trace-warnings --no-fork",
+    "generate": "nuxt build --prerender",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "nuxt generate",

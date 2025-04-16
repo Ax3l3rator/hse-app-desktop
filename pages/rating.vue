@@ -60,9 +60,14 @@
       <v-col>
         <v-list v-if="ratings_grouped" class="rounded-lg">
           <div v-for="(rating_item, index, j) in ratings_grouped">
-            <v-list-item>
+            <v-list-item class="pa-0">
               <template #prepend> </template>
-              <v-list-item :to="`/students/${rating.profile.email}`" v-for="(rating, i) in rating_item" rounded="lg">
+              <v-list-item
+                :to="`/students/${rating.profile.email}`"
+                v-for="(rating, i) in rating_item"
+                rounded="lg"
+                class="mx-2"
+              >
                 <v-list-item-title> {{ rating.profile.full_name }} </v-list-item-title>
                 <template #prepend>
                   <div
@@ -83,7 +88,7 @@
                   <div class="text-primary">{{ rating.percentile }}%</div>
                 </template>
               </v-list-item>
-              <v-divider class="mt-2" v-if="j !== Object.values(ratings_grouped).length - 1"></v-divider>
+              <v-divider class="my-2" v-if="j !== Object.values(ratings_grouped).length - 1"></v-divider>
             </v-list-item>
           </div>
         </v-list>

@@ -1,5 +1,11 @@
 # HSE DESKTOP APP
 
+## Скачать | Download
+
+[Download from github releases](https://github.com/ax3l3rator/hse-app-desktop/releases/latest)
+
+## Tech info
+
 Запуск:
 
 ```bash
@@ -12,17 +18,9 @@ yarn dev
 yarn generate
 ```
 
-## Release publish protocol
+## Release publishing
 
-### Windows
-
-```bash
-gh release create <your.version.here>
-```
-
-```bash
-gh release upload <your.version.here> '.\release\<your.version.here>\<file here>'
-```
+### Windows (requires gh)
 
 ```powershell
 $version = node -p 'require("./package.json").version'
@@ -36,4 +34,5 @@ Get-ChildItem -Path .\release\$version\win -File | ForEach-Object {
 Get-ChildItem -Path .\release\$version\linux -File | ForEach-Object {
     gh release upload $version $_.FullName --clobber
 }
+
 ```

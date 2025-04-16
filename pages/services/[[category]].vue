@@ -3,20 +3,30 @@
     <v-row justify="space-between" self-align="space-between">
       <v-col v-for="service in service_list" :key="service.id">
         <v-card variant="outlined" rounded="lg" class="py-3" min-width="420">
-          <v-card-item>
+          <v-card-item style="width: 100%">
             <template #prepend>
               <v-avatar tile size="100">
                 <v-img :src="service.icon"></v-img>
               </v-avatar>
             </template>
-
-            <v-card-title> {{ service.name }} </v-card-title>
-            <v-card-subtitle v-if="service.description" class="text-medium-emphasis">
-              {{ service.description }}
-            </v-card-subtitle>
-            <div class="pt-2">
-              <v-btn rounded="lg" @click="openService(service)" variant="flat" color="primary" block>ПЕРЕЙТИ</v-btn>
-            </div>
+            <template #default>
+              <div class="d-flex flex-column px-2">
+                <v-card-title> {{ service.name }} </v-card-title>
+                <v-card-subtitle v-if="service.description" class="text-medium-emphasis">
+                  {{ service.description }}
+                </v-card-subtitle>
+                <div style="height: 8.05px"></div>
+                <v-btn
+                  class="align-self-end"
+                  rounded="lg"
+                  @click="openService(service)"
+                  variant="flat"
+                  color="primary"
+                  block
+                  >ПЕРЕЙТИ</v-btn
+                >
+              </div>
+            </template>
           </v-card-item>
         </v-card>
       </v-col>
