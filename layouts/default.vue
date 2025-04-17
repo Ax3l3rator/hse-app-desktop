@@ -190,13 +190,13 @@ const menuElements = ref([
 
 onMounted(() => {
   if (import.meta.dev) {
-    menuElements.value.push({
-      icon: 'mdi-test-tube',
-      title: 'Тестовая страница',
-      value: 'testing-page',
-      to: '/testing',
-      type: 'any',
-    });
+    // menuElements.value.push({
+    //   icon: 'mdi-test-tube',
+    //   title: 'Тестовая страница',
+    //   value: 'testing-page',
+    //   to: '/testing',
+    //   type: 'any',
+    // });
   }
 });
 

@@ -3,7 +3,7 @@ import type { SearchType } from '~/types/search';
 
 contextBridge.exposeInMainWorld('ipcBridge', {
   authorizeViaBrowser: async () => ipcRenderer.invoke('auth-hse-browser'),
-  checkIfAuthorized: async () => await ipcRenderer.invoke('check-authorization'),
+  checkIfAuthorized: async () => ipcRenderer.invoke('check-authorization'),
   leave: async () => await ipcRenderer.invoke('leave'),
   getFullUserInfo: async () => await ipcRenderer.invoke('get-full-user-info'),
   onAuthorize: async (callback: (...args: any[]) => void) =>

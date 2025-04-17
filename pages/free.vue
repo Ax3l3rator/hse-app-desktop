@@ -98,8 +98,8 @@
 
     <v-row v-else>
       <v-col>
-        <v-card variant="outlined" rounded="lg">
-          <v-list v-if="auditoriums" class="rounded-lg" bg-color="background">
+        <v-card v-if="auditoriums && Object.keys(auditoriums).length" variant="outlined" rounded="lg">
+          <v-list class="rounded-lg" bg-color="background">
             <div v-for="(_, group) in auditoriums">
               <div v-if="Object.keys(auditoriums).length > 1">
                 <v-list-subheader>
@@ -123,6 +123,7 @@
             </div>
           </v-list>
         </v-card>
+        <v-empty-state v-else icon="mdi-door-closed-cancel" title="Свободных аудиторий не нашлось"></v-empty-state>
       </v-col>
     </v-row>
   </v-container>

@@ -10,10 +10,9 @@
       <v-card-subtitle class="text-h6">{{ cafe_info.description }}</v-card-subtitle>
 
       <v-card-item v-if="cafe_menu">
-        <v-alert v-if="cafe_menu.notify" :text="cafe_menu.notify" type="warning" class="my-4"></v-alert>
+        <v-alert rounded="lg" v-if="cafe_menu.notify" :text="cafe_menu.notify" type="warning" class="my-4"></v-alert>
         <!-- <v-alert type="warning" class="my-4"> Отображаемое меню не актуально, мы работаем над этим</v-alert> -->
-        <v-card-title class="text-h5">Меню</v-card-title> автоматический выбор, авто заказ аудитории, выводы из а
-        следует б
+        <v-card-title class="text-h5">Меню</v-card-title>
         <v-list>
           <div v-for="section in cafe_menu.sections">
             <v-list-item>

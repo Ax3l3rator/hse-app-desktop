@@ -40,6 +40,7 @@ export default defineNuxtConfig({
   ssr: false,
 
   experimental: {
+    payloadExtraction: false,
     appManifest: false, // set this to false, then the application starts working
   },
 
@@ -64,15 +65,14 @@ export default defineNuxtConfig({
     },
   },
 
-  // nitro: {
-  //   routeRules: {
-  //     '/*': { cors: true },
-  //     '/': { prerender: true },
-  //   },
-  // },
+  nitro: {
+    routeRules: {
+      '/*': { cors: true },
+      '/': { prerender: true },
+    },
+  },
   app: {
     baseURL: './',
-    pageTransition: { name: 'page', mode: 'out-in' },
   },
 
   compatibilityDate: '2025-03-14',

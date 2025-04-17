@@ -41,7 +41,7 @@
     <v-skeleton-loader type="card-avatar"></v-skeleton-loader>
   </div>
   <div v-else>
-    <nothing-found name="студенте"></nothing-found>
+    <v-empty-state icon="mdi-card-account-details-outline" title="Информации о студенте не нашлось"></v-empty-state>
   </div>
 </template>
 <script setup lang="ts">

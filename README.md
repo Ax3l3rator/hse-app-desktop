@@ -36,3 +36,7 @@ Get-ChildItem -Path .\release\$version\linux -File | ForEach-Object {
 }
 
 ```
+
+## Комментарии от КТ3
+
+автоматический выбор, авто заказ аудитории, выводы из а следует б в вкр

@@ -12,7 +12,7 @@
               <div class="mr-2">
                 {{ info.full_name }}
               </div>
-              <v-snackbar :timeout="1000" color="primary">
+              <v-snackbar rounded="lg" :timeout="1000" color="primary">
                 Скопировано!
                 <template v-slot:activator="{ props }">
                   <v-chip color="primary" prepend-icon="mdi-at" @click="copyToClipBoard(info.email)" v-bind="props">
@@ -60,7 +60,7 @@
     <v-skeleton-loader type="card-avatar"></v-skeleton-loader>
   </div>
   <div v-else>
-    <nothing-found name="сотруднике"></nothing-found>
+    <v-empty-state icon="mdi-card-account-details-outline" title="Информации о сотруднике не нашлось"></v-empty-state>
   </div>
 </template>
 <script setup lang="ts">
