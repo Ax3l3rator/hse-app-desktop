@@ -77,6 +77,7 @@ export class HSEAuthService {
       })
         .then((accessData) => {
           Vault.saveAccessData(accessData);
+          resolve(true);
         })
         .catch((error) => {
           console.error('Something went wrong during refreshing auth data:', error);

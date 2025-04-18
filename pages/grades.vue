@@ -119,11 +119,11 @@
         </v-row>
       </v-container>
     </v-overlay>
-    <v-container max-width="1280" class="pt-4">
+    <v-container max-width="1280" class="pt-1">
       <v-row no-gutters>
         <v-col>
           <v-tabs
-            v-if="grades_raw"
+            v-if="grades_raw && grades_raw.available_programs.length"
             v-model="program"
             align-tabs="center"
             grow
@@ -135,7 +135,7 @@
           </v-tabs>
 
           <v-tabs
-            v-if="grades_raw && !grades_raw.error"
+            v-if="grades_raw && !grades_raw.error && grades_raw.available_academic_years.length"
             v-model="academic_year"
             align-tabs="center"
             density="comfortable"
@@ -145,7 +145,7 @@
           >
             <v-tab v-for="year in grades_raw.available_academic_years" :value="year" :text="year"></v-tab>
           </v-tabs>
-          <v-list density="compact" lines="two" v-if="grades_sorted && !grades_raw.error" class="rounded-b-lg">
+          <v-list class="mt-2" density="comfortable" lines="one" v-if="grades_sorted && !grades_raw.error">
             <div v-for="(grades, module) in grades_sorted" :key="module">
               <v-list-subheader class="text-button">{{ module }}</v-list-subheader>
               <div v-if="grades" v-for="(grade, index) in grades" :key="grade.asav_uid">
@@ -244,27 +244,15 @@ window.ipcBridge.getGrades().then((res) => {
   is_page_loading.value = false;
 });
 
-onMounted(() => {
-  watch(program, async (newProgram, oldProgram) => {
-    is_page_loading.value = true;
-    if (newProgram != oldProgram && program.value) {
-      window.ipcBridge.getGrades(program.value.id).then((res) => {
-        grades_raw.value = res;
-        grades_parsed.value = res.items;
-        is_page_loading.value = false;
-      });
-    }
-  });
-
-  watch(academic_year, async (newYear, oldYear) => {
-    is_page_loading.value = true;
-    if (newYear != oldYear && program.value?.id !== undefined && academic_year.value !== undefined) {
-      window.ipcBridge.getGrades(program.value.id, newYear).then((res) => {
-        grades_raw.value = res;
-        grades_parsed.value = res.items;
-        is_page_loading.value = false;
-      });
-    }
+watch([program, academic_year], async ([new_program, new_year], [old_program, old_year]) => {
+  if (old_year === '' && old_program === undefined) {
+    return;
+  }
+  is_page_loading.value = true;
+  window.ipcBridge.getGrades(new_program?.id, new_year).then((res) => {
+    grades_raw.value = res;
+    grades_parsed.value = res.items;
+    is_page_loading.value = false;
   });
 });
 </script>

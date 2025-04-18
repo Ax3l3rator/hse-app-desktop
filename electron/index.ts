@@ -1,5 +1,5 @@
 // import './security';
-import { app, ipcMain, shell } from 'electron';
+import { app, ipcMain, safeStorage, shell } from 'electron';
 import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
 import './security';
 import { platform } from 'node:process';
@@ -80,7 +80,11 @@ app.on('activate', restoreOrCreateWindow);
 app
   .whenReady()
   .then(() => {
-    // handlers
+    if (!safeStorage.isEncryptionAvailable()) {
+      console.warn('using plain text encryption');
+      safeStorage.setUsePlainTextEncryption(true);
+    }
+
     ipcMain.handle('get-full-user-info', async () => await HSEAuthService.getFullUserInfo());
     ipcMain.handle('leave', HSEAuthService.leave);
     ipcMain.handle('auth-hse-browser', () => HSEAuthService.openAuthBrowserExternal());

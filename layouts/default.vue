@@ -55,6 +55,7 @@
             :to="element.to"
             :prepend-icon="element.icon"
             :title="element.title"
+            class="my-1"
           >
           </v-list-item>
         </div>
