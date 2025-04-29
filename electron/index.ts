@@ -1,15 +1,14 @@
 // import './security';
-import { app, ipcMain, safeStorage, shell } from 'electron';
+import { app, safeStorage } from 'electron';
 import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
 import './security';
 import { platform } from 'node:process';
 import { resolve } from 'path';
 import { HSEAuthService } from './utils/HSEAuthService';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { HSEAPIService } from './utils/HSEAPIService';
-import type { SearchType } from '~/types/search';
+import './handlers';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -19,27 +18,54 @@ if (!isSingleInstance) {
   process.exit(0);
 }
 
+function updateDesktopEntries(home_folder: string, desktop_file_path: string) {
+  const update_proc = spawnSync(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+  if (update_proc.error) {
+    //@ts-expect-error
+    if (update_proc.error.code === 'ENOENT') {
+      console.error(
+        'update-desktop-database is not installed in system, try installing it with desktop-file-utils package',
+      );
+    } else {
+      console.error('Something went wrong during update-desktop-database');
+    }
+    unlinkSync(desktop_file_path);
+    app.quit();
+    process.exit(0);
+  }
+}
+
 if (platform === 'linux') {
   const home_folder = app.getPath('home');
   const exe_path = app.getPath('exe');
-
+  const applications_folder_path = join(home_folder, '.local', 'share', 'applications');
   const desktop_file_path = join(home_folder, '.local', 'share', 'applications', 'hse-app.desktop');
 
-  if (spawnSync('which', ['hse-app-desktop']).status === 1) {
+  if (!existsSync(applications_folder_path)) {
+    console.log('applications folder does not exist, creating');
+    mkdirSync(applications_folder_path, { recursive: true });
+  }
+
+  if (spawnSync('which', ['hse-app-desktop']).status !== 0) {
+    console.log('Hse App is not installed in system');
     if (!existsSync(desktop_file_path)) {
+      console.log('Desktop entry does not exist, creating it in');
       writeFileSync(
         desktop_file_path,
-        `[Desktop Entry]\nType=Application\nName=hse-app-desktop\nMimeType=x-scheme-handler/ruz-app-fiddle\nExec=${exe_path} %u\n`,
+        `[Desktop Entry]\nType=Application\nName=hse-app-desktop\nMimeType=x-scheme-handler/ruz-app-fiddle\nExec=${exe_path} %u`,
       );
-      spawnSync(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+      updateDesktopEntries(home_folder, desktop_file_path);
     } else {
+      console.log('Desktop entry exists, editing it');
       const desktop_file_contents = readFileSync(desktop_file_path);
+
       const lines = desktop_file_contents.toString().split('\n');
+      console.log(lines);
       const actual_exec_line = `Exec=${exe_path} %u`;
       if (lines[lines.length - 1] !== actual_exec_line) {
         lines[lines.length - 1] = actual_exec_line;
         writeFileSync(desktop_file_path, lines.join('\n'));
-        spawnSync(`update-desktop-database`, [`${home_folder}/.local/share/applications`]);
+        updateDesktopEntries(home_folder, desktop_file_path);
       }
     }
   }
@@ -84,52 +110,6 @@ app
       console.warn('using plain text encryption');
       safeStorage.setUsePlainTextEncryption(true);
     }
-
-    ipcMain.handle('get-full-user-info', async () => await HSEAuthService.getFullUserInfo());
-    ipcMain.handle('leave', HSEAuthService.leave);
-    ipcMain.handle('auth-hse-browser', () => HSEAuthService.openAuthBrowserExternal());
-    ipcMain.handle('check-authorization', async () => {
-      try {
-        const res = await HSEAuthService.authorize();
-        return res;
-      } catch (err) {
-        return false;
-      }
-    });
-
-    ipcMain.handle('get-search-results', (event, query: string, type: SearchType) =>
-      HSEAPIService.requestSearchResults(query, type).then((res) => {
-        event.sender.send('search-results-arrived', res);
-      }),
-    );
-    ipcMain.handle('get-name-by-email', async (_, email) => await HSEAPIService.getNameByEmail(email));
-    ipcMain.handle('get-full-person-info', async (_, email) => await HSEAPIService.getFullPersonInfo(email));
-    ipcMain.handle('get-buildings', async () => await HSEAPIService.getBuildings());
-    ipcMain.handle(
-      'get-grades',
-      async (_, program_id, academic_year) => await HSEAPIService.getGrades(program_id, academic_year),
-    );
-
-    ipcMain.handle('get-personal-rating', async () => await HSEAPIService.getPersonalRating());
-    ipcMain.handle('get-rating-list', async () => await HSEAPIService.getRatingList());
-    ipcMain.handle('get-rating', async (_, target, id) => await HSEAPIService.getRating(target, id));
-
-    ipcMain.handle('get-service-list', async (_, category) => await HSEAPIService.getServiceList(category));
-
-    ipcMain.handle('get-cafe', async (_, id) => await HSEAPIService.getCafe(id));
-    ipcMain.handle('get-cafe-menu', async (_, id) => await HSEAPIService.getCafeMenu(id));
-
-    ipcMain.handle('get-free-auditoriums', (event, building_id, date_from, date_to) =>
-      HSEAPIService.getFreeAuditoriums(building_id, date_from, date_to).then((res) => {
-        event.sender.send('free-auditoriums-arrived', res);
-      }),
-    );
-
-    ipcMain.handle('open-in-browser', (_, url) => {
-      shell.openExternal(url);
-    });
-
-    ipcMain.handle('get-student-schedule', async (_, email) => await HSEAPIService.getSchedule(email));
 
     restoreOrCreateWindow();
   })
