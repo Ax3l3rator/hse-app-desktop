@@ -22,9 +22,9 @@
               </v-snackbar>
             </v-row>
           </v-card-title>
-          <v-card-subtitle>
+          <v-card-subtitle v-if="info">
             {{ info.description }}
-            <v-chip density="comfortable" v-if="info" prepend-icon="mdi-cake-variant">
+            <v-chip v-if="info.birth_date" density="comfortable" prepend-icon="mdi-cake-variant">
               {{ new Date(info.birth_date).getDate() }}
               {{ months[new Date(info.birth_date).getMonth()] }}
             </v-chip>
