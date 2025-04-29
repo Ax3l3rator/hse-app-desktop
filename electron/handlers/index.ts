@@ -1,3 +1,3 @@
-import 'auth';
-import 'api';
-import 'app';
+import './auth';
+import './api';
+import './app';
