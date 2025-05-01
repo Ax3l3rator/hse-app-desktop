@@ -4,7 +4,7 @@ import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
 import './security';
 import { platform } from 'node:process';
 import { resolve } from 'path';
-import { HSEAuthService } from './utils/HSEAuthService';
+import { HseAuth } from './logic/HseAuth';
 import { existsSync, readFileSync, unlinkSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -87,7 +87,7 @@ app.on('second-instance', async (event, commandLine) => {
   const deepLink = commandLine.at(-1);
   if (deepLink) {
     try {
-      await HSEAuthService.authorizeByRedirectUrl(deepLink);
+      await HseAuth.authorizeByRedirectUrl(deepLink);
       setTimeout(async () => {
         await sendAuthEvent();
       }, 1000);

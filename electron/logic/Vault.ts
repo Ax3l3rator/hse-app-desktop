@@ -52,10 +52,4 @@ export class Vault {
     Vault.store.delete('access_retrieved');
     Vault.store.delete('refresh_retrieved');
   }
-
-  public static setUserData(json: string) {
-    Vault.store.set('user_data', json);
-  }
-
-  public static getUserData() {}
 }

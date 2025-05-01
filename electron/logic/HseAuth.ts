@@ -5,7 +5,7 @@ import { Vault } from './Vault';
 import type { AccessData } from '../types';
 import { sendLeaveEvent } from '../mainWindow';
 
-export class HSEAuthService {
+export class HseAuth {
   private static getCodeFromUrl(url: string): string {
     const code = new URL(url).searchParams.get('code');
     if (!code) throw new Error('Code Parsing went wrong!');
@@ -50,15 +50,15 @@ export class HSEAuthService {
         reject(error);
       });
 
-      request.write(HSEAuthService.getURLEncodedParams(grant_type, additional_data));
+      request.write(HseAuth.getURLEncodedParams(grant_type, additional_data));
 
       request.end();
     });
   }
 
   public static async authorizeByRedirectUrl(redirectUrl: string) {
-    const code = HSEAuthService.getCodeFromUrl(redirectUrl);
-    const accessData = await HSEAuthService.requestAccessData('authorization_code', { code });
+    const code = HseAuth.getCodeFromUrl(redirectUrl);
+    const accessData = await HseAuth.requestAccessData('authorization_code', { code });
     try {
       Vault.saveAccessData(accessData);
     } catch (err) {
@@ -68,11 +68,11 @@ export class HSEAuthService {
 
   public static async refreshAccessData() {
     return new Promise((resolve, reject) => {
-      if (!HSEAuthService.isTokenValid('refresh')) {
+      if (!HseAuth.isTokenValid('refresh')) {
         throw 'refresh is not valid';
       }
 
-      HSEAuthService.requestAccessData('refresh_token', {
+      HseAuth.requestAccessData('refresh_token', {
         refresh_token: Vault.getToken('refresh').token,
       })
         .then((accessData) => {
@@ -94,7 +94,7 @@ export class HSEAuthService {
       return false;
     }
 
-    if (HSEAuthService.isExpiredToken(token_type)) {
+    if (HseAuth.isExpiredToken(token_type)) {
       console.log(`${token_type} token is expired`);
       return false;
     } else {
@@ -109,11 +109,11 @@ export class HSEAuthService {
 
   public static async authorize() {
     return new Promise<boolean>((resolve, reject) => {
-      if (HSEAuthService.isTokenValid('access')) {
+      if (HseAuth.isTokenValid('access')) {
         resolve(true);
       } else {
         console.log('Trying to refresh access data...');
-        HSEAuthService.refreshAccessData()
+        HseAuth.refreshAccessData()
           .then(() => resolve(true))
           .catch((_) => {
             reject(false);
@@ -150,39 +150,7 @@ export class HSEAuthService {
   }
 
   public static openAuthBrowserExternal() {
-    shell.openExternal(HSEAuthService.getStdAuthURL());
-  }
-
-  public static async getFullUserInfo() {
-    return new Promise<any>((resolve, reject) => {
-      const request = net.request({
-        url: 'https://api.hseapp.ru/v3/dump/me',
-        method: 'GET',
-      });
-      const accessToken = Vault.getToken('access');
-      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
-      request.setHeader('Accept-Language', 'ru');
-      request.on('response', (response) => {
-        const data: Buffer[] = [];
-        response.on('data', (chunk) => {
-          data.push(chunk);
-        });
-        response.on('end', () => {
-          const responseData = JSON.parse(Buffer.concat(data).toString());
-          resolve(responseData);
-        });
-        response.on('error', (err: Error) => {
-          console.error('An error response:', err);
-        });
-      });
-
-      request.on('error', (error: Error) => {
-        console.error('getFullUserInfo', error);
-        reject(error);
-      });
-
-      request.end();
-    });
+    shell.openExternal(HseAuth.getStdAuthURL());
   }
 
   public static leave() {

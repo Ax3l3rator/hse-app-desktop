@@ -1,7 +1,7 @@
 import { net } from 'electron';
 import { Vault } from './Vault';
 import type { SearchType } from '~/types/search';
-export class HSEAPIService {
+export class HseAppApi {
   public static async requestSearchResults(query: string, type: SearchType) {
     return new Promise((resolve, reject) => {
       if (query.length < 3) {
@@ -453,6 +453,38 @@ export class HSEAPIService {
 
       request.on('error', (error: Error) => {
         console.error('getSchedule', error);
+        reject(error);
+      });
+
+      request.end();
+    });
+  }
+
+  public static async getFullUserInfo() {
+    return new Promise<any>((resolve, reject) => {
+      const request = net.request({
+        url: 'https://api.hseapp.ru/v3/dump/me',
+        method: 'GET',
+      });
+      const accessToken = Vault.getToken('access');
+      request.setHeader('Authorization', `Bearer ${accessToken.token}`);
+      request.setHeader('Accept-Language', 'ru');
+      request.on('response', (response) => {
+        const data: Buffer[] = [];
+        response.on('data', (chunk) => {
+          data.push(chunk);
+        });
+        response.on('end', () => {
+          const responseData = JSON.parse(Buffer.concat(data).toString());
+          resolve(responseData);
+        });
+        response.on('error', (err: Error) => {
+          console.error('An error response:', err);
+        });
+      });
+
+      request.on('error', (error: Error) => {
+        console.error('getFullUserInfo', error);
         reject(error);
       });
 

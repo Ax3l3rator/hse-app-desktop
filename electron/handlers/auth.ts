@@ -1,12 +1,11 @@
 import { ipcMain } from 'electron';
-import { HSEAuthService } from '../utils/HSEAuthService';
+import { HseAuth } from '../logic/HseAuth';
 
-ipcMain.handle('get-full-user-info', async () => await HSEAuthService.getFullUserInfo());
-ipcMain.handle('leave', HSEAuthService.leave);
-ipcMain.handle('auth-hse-browser', () => HSEAuthService.openAuthBrowserExternal());
+ipcMain.handle('leave', HseAuth.leave);
+ipcMain.handle('auth-hse-browser', () => HseAuth.openAuthBrowserExternal());
 ipcMain.handle('check-authorization', async () => {
   try {
-    const res = await HSEAuthService.authorize();
+    const res = await HseAuth.authorize();
     return res;
   } catch (err) {
     return false;
