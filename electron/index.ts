@@ -1,5 +1,5 @@
 // import './security';
-import { app, safeStorage } from 'electron';
+import { app, ipcMain, net, safeStorage } from 'electron';
 import { restoreOrCreateWindow, sendAuthEvent } from './mainWindow';
 import './security';
 import { platform } from 'node:process';
@@ -9,6 +9,7 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync, mkdirSync } from '
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import './handlers';
+import './storage';
 
 const isSingleInstance = app.requestSingleInstanceLock();
 app.commandLine.appendSwitch('enable-overlay-scrollbar');
@@ -110,7 +111,7 @@ app
       console.warn('using plain text encryption');
       safeStorage.setUsePlainTextEncryption(true);
     }
-
+    ipcMain.handle('is-online', () => net.isOnline());
     restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

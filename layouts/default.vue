@@ -123,18 +123,16 @@ import { useUserStore } from '~/store/user';
 import { usePageStore } from '~/store/page';
 
 const theme = useTheme();
-const themeName = ref('dark');
 const userStore = useUserStore();
 const router = useRouter();
 
 const { page_name, is_page_loading } = storeToRefs(usePageStore());
 
-watch(themeName, () => {
-  theme.global.name.value = themeName.value;
-});
+theme.global.name.value = await window.ipcBridge.getSettingsStorageParam('theme');
 
-function toggleTheme() {
+async function toggleTheme() {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
+  await window.ipcBridge.setSettingsStorageParam('theme', theme.global.name.value as 'dark' | 'light');
 }
 
 const menuElements = ref([

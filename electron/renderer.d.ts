@@ -4,6 +4,7 @@ import type { Grades } from '~/types/grades';
 import type { PersonalRating, Rating, RatingList } from '~/types/rating';
 import type { SearchType } from '~/types/search';
 import type { ServiceList } from '~/types/services';
+import type { SettingsStorageData } from './storage/SettingsStorage';
 
 type CafeResult<T> = T extends string ? Cafe : BuildingCafes;
 
@@ -30,6 +31,17 @@ export interface IipcBridge {
   openInBrowser: (url: string) => void;
   getCafe: <T extends string | undefined = undefined>(id?: T) => Promise<CafeResult<T>>;
   getCafeMenu: (id: string) => Promise<CafeMenu>;
+
+  isOnline: () => Promise<boolean>;
+
+  setSettingsStorageParam: (
+    parameter_name: keyof SettingsStorageData,
+    parameter_value: SettingsStorageData[keyof SettingsStorageData],
+  ) => Promise<any>;
+
+  getSettingsStorageParam: (
+    parameter_name: keyof SettingsStorageData,
+  ) => Promise<SettingsStorageData[keyof SettingsStorageData]>;
 }
 
 declare global {

@@ -34,4 +34,8 @@ contextBridge.exposeInMainWorld('ipcBridge', {
   openInBrowser: (url: string) => ipcRenderer.invoke('open-in-browser', url),
   getCafe: (id: string) => ipcRenderer.invoke('get-cafe', id),
   getCafeMenu: (id: string) => ipcRenderer.invoke('get-cafe-menu', id),
+  setSettingsStorageParam: (parameter_name: string, parameter_value: any) =>
+    ipcRenderer.invoke('settings-storage-set', parameter_name, parameter_value),
+  getSettingsStorageParam: (parameter_name: string) => ipcRenderer.invoke('settings-storage-get', parameter_name),
+  isOnline: () => ipcRenderer.invoke('is-online'),
 });
