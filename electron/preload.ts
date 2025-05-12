@@ -38,4 +38,7 @@ contextBridge.exposeInMainWorld('ipcBridge', {
     ipcRenderer.invoke('settings-storage-set', parameter_name, parameter_value),
   getSettingsStorageParam: (parameter_name: string) => ipcRenderer.invoke('settings-storage-get', parameter_name),
   isOnline: () => ipcRenderer.invoke('is-online'),
+  getLocalCafe: () => ipcRenderer.invoke('get-local-cafe'),
+  getLocalCafeDateInfo: () => ipcRenderer.invoke('get-local-cafe-date-info'),
+  setLocalCafe: (local_cafe_info) => ipcRenderer.invoke('set-local-cafe'),
 });

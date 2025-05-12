@@ -1,1 +1,2 @@
 import './SettingsStorage';
+import './CafeStorage';
