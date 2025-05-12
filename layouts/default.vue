@@ -189,13 +189,13 @@ const menuElements = ref([
 
 onMounted(() => {
   if (import.meta.dev) {
-    // menuElements.value.push({
-    //   icon: 'mdi-test-tube',
-    //   title: 'Тестовая страница',
-    //   value: 'testing-page',
-    //   to: '/testing',
-    //   type: 'any',
-    // });
+    menuElements.value.push({
+      icon: 'mdi-test-tube',
+      title: 'Тестовая страница',
+      value: 'testing-page',
+      to: '/testing',
+      type: 'any',
+    });
   }
 });
 
@@ -231,7 +231,7 @@ setTimeout(async () => {
   userStore.full_name = `${userData.value?.names.last_name} ${userData.value?.names.first_name} ${userData.value?.names.middle_name}`;
   userStore.avatar_url = userData.value!.avatar_url;
   loading.value = false;
-}, 200);
+}, 10);
 
 window.ipcBridge.onLeave(() => {
   navigateTo('unauthorized');

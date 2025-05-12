@@ -3,7 +3,7 @@
 import Store from 'electron-store';
 import { SECRET_KEY } from '../config';
 export class BaseLocalStorage<DataStructure extends Record<string, any>> {
-  private store;
+  protected store;
   public name;
 
   constructor(storage_name: string, defaults?: DataStructure) {

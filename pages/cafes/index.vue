@@ -23,11 +23,16 @@
               <v-list-item-title>{{ cafe.cafe_name }}</v-list-item-title>
               <v-list-item-subtitle>
                 <span v-if="isCafeOpenNow(cafe.opening_hours).is_open">
-                  <span class="text-green">Открыто</span> | Закроется в
-                  {{ isCafeOpenNow(cafe.opening_hours).next_time }}
+                  <span class="text-green">Открыто</span>
+                  <span v-if="isCafeOpenNow(cafe.opening_hours).next_time">
+                    | Закроется в {{ isCafeOpenNow(cafe.opening_hours).next_time }}</span
+                  >
                 </span>
                 <span v-else>
-                  <span class="text-red">Закрыто</span> | Откроется в {{ isCafeOpenNow(cafe.opening_hours).next_time }}
+                  <span class="text-red">Закрыто</span>
+                  <span v-if="isCafeOpenNow(cafe.opening_hours).next_time">
+                    | Откроется в {{ isCafeOpenNow(cafe.opening_hours).next_time }}</span
+                  >
                 </span>
               </v-list-item-subtitle>
               <template #prepend>

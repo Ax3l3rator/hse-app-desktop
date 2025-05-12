@@ -7,6 +7,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
   } else {
     if (to.path !== '/unauthorized') {
+      setPageLayout('unauthorized');
       return navigateTo('/unauthorized');
     }
   }
